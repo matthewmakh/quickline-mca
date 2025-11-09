@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Credit Line Details - QuickLine LLC{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-file-text"></i> Credit Line Details</h1>
+    <a href="{{ url_for('customer.dashboard') }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Dashboard
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="mb-4">Complete Line of Credit Information</h5>
+        
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="border-start border-primary border-4 ps-3 mb-3">
+                    <small class="text-muted">Total Credit Line</small>
+                    <h3 class="text-primary mb-0">${{ "{:,.2f}".format(loc.approved_amount) }}</h3>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="border-start border-success border-4 ps-3 mb-3">
+                    <small class="text-muted">Available Credit</small>
+                    <h3 class="text-success mb-0">${{ "{:,.2f}".format(loc.approved_amount - loc.used_amount) }}</h3>
+                </div>
+            </div>
+        </div>
+        
+        <table class="table">
+            <tbody>
+                <tr>
+                    <th width="30%">Business Name</th>
+                    <td>{{ customer.business_name }}</td>
+                </tr>
+                <tr>
+                    <th>Approved Credit Amount</th>
+                    <td>${{ "{:,.2f}".format(loc.approved_amount) }}</td>
+                </tr>
+                <tr>
+                    <th>Amount Currently Used</th>
+                    <td>${{ "{:,.2f}".format(loc.used_amount) }}</td>
+                </tr>
+                <tr>
+                    <th>Available Credit</th>
+                    <td class="text-success fw-bold">${{ "{:,.2f}".format(loc.approved_amount - loc.used_amount) }}</td>
+                </tr>
+                <tr>
+                    <th>Interest Rate</th>
+                    <td>{{ loc.interest_rate }}% APR</td>
+                </tr>
+                {% if loc.factor_rate %}
+                <tr>
+                    <th>Factor Rate</th>
+                    <td>{{ loc.factor_rate }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th>Payment Frequency</th>
+                    <td>{{ loc.payment_frequency }}</td>
+                </tr>
+                <tr>
+                    <th>Payment Amount</th>
+                    <td>${{ "{:,.2f}".format(loc.payment_amount) }}</td>
+                </tr>
+                <tr>
+                    <th>Term Length</th>
+                    <td>{{ loc.term_months }} months</td>
+                </tr>
+                {% if loc.outstanding_balance %}
+                <tr>
+                    <th>Outstanding Balance</th>
+                    <td>${{ "{:,.2f}".format(loc.outstanding_balance) }}</td>
+                </tr>
+                {% endif %}
+                {% if loc.total_paid %}
+                <tr>
+                    <th>Total Amount Paid</th>
+                    <td>${{ "{:,.2f}".format(loc.total_paid) }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th>Account Status</th>
+                    <td>
+                        {% if loc.status == 'active' %}
+                            <span class="badge bg-success">Active</span>
+                        {% elif loc.status == 'paid_off' %}
+                            <span class="badge bg-info">Paid Off</span>
+                        {% elif loc.status == 'suspended' %}
+                            <span class="badge bg-warning">Suspended</span>
+                        {% else %}
+                            <span class="badge bg-danger">Defaulted</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% if loc.first_payment_date %}
+                <tr>
+                    <th>First Payment Date</th>
+                    <td>{{ loc.first_payment_date.strftime('%B %d, %Y') }}</td>
+                </tr>
+                {% endif %}
+                {% if loc.maturity_date %}
+                <tr>
+                    <th>Maturity Date</th>
+                    <td>{{ loc.maturity_date.strftime('%B %d, %Y') }}</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

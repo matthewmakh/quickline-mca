@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}Customer Dashboard - QuickLine LLC{% endblock %}
+
+{% block content %}
+<h1 class="mb-4"><i class="bi bi-person-circle"></i> Welcome, {{ customer.business_name }}!</h1>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="stat-card">
+            <h3>${{ "{:,.0f}".format(loc.approved_amount) }}</h3>
+            <p>Total Credit Line</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card" style="background: linear-gradient(135deg, #10b981, #059669);">
+            <h3>${{ "{:,.0f}".format(loc.approved_amount - loc.used_amount) }}</h3>
+            <p>Available Credit</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card" style="background: linear-gradient(135deg, #f59e0b, #f97316);">
+            <h3>{{ "%.1f"|format(utilization_percentage) }}%</h3>
+            <p>Credit Utilized</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-credit-card"></i> Line of Credit Overview</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-4 text-center">
+                        <div class="p-3 bg-light rounded">
+                            <small class="text-muted">Approved Amount</small>
+                            <h4 class="mb-0 text-primary">${{ "{:,.2f}".format(loc.approved_amount) }}</h4>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="p-3 bg-light rounded">
+                            <small class="text-muted">Amount Used</small>
+                            <h4 class="mb-0 text-danger">${{ "{:,.2f}".format(loc.used_amount) }}</h4>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="p-3 bg-light rounded">
+                            <small class="text-muted">Available</small>
+                            <h4 class="mb-0 text-success">${{ "{:,.2f}".format(loc.approved_amount - loc.used_amount) }}</h4>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Credit Utilization</label>
+                    <div class="progress" style="height: 30px;">
+                        <div class="progress-bar {% if utilization_percentage > 80 %}bg-danger{% elif utilization_percentage > 60 %}bg-warning{% else %}bg-success{% endif %}" 
+                             role="progressbar" style="width: {{ utilization_percentage }}%">
+                            {{ "%.1f"|format(utilization_percentage) }}%
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Interest Rate:</strong> {{ loc.interest_rate }}% APR</p>
+                        <p><strong>Payment Frequency:</strong> {{ loc.payment_frequency }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Payment Amount:</strong> ${{ "{:,.2f}".format(loc.payment_amount) }}</p>
+                        <p><strong>Term:</strong> {{ loc.term_months }} months</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-calendar-check"></i> Important Dates</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% if loc.first_payment_date %}
+                    <div class="col-md-6">
+                        <p><strong>First Payment Date:</strong><br>
+                        {{ loc.first_payment_date.strftime('%B %d, %Y') }}</p>
+                    </div>
+                    {% endif %}
+                    {% if loc.next_payment_date %}
+                    <div class="col-md-6">
+                        <p><strong>Next Payment Date:</strong><br>
+                        <span class="text-primary">{{ loc.next_payment_date.strftime('%B %d, %Y') }}</span></p>
+                    </div>
+                    {% endif %}
+                    {% if loc.maturity_date %}
+                    <div class="col-md-6">
+                        <p><strong>Maturity Date:</strong><br>
+                        {{ loc.maturity_date.strftime('%B %d, %Y') }}</p>
+                    </div>
+                    {% endif %}
+                    {% if loc.last_payment_date %}
+                    <div class="col-md-6">
+                        <p><strong>Last Payment:</strong><br>
+                        {{ loc.last_payment_date.strftime('%B %d, %Y') }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Account Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Status:</strong><br>
+                    {% if loc.status == 'active' %}
+                        <span class="badge bg-success fs-6">Active</span>
+                    {% elif loc.status == 'paid_off' %}
+                        <span class="badge bg-info fs-6">Paid Off</span>
+                    {% elif loc.status == 'suspended' %}
+                        <span class="badge bg-warning fs-6">Suspended</span>
+                    {% else %}
+                        <span class="badge bg-danger fs-6">Defaulted</span>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Account Since:</strong><br>
+                    {{ customer.created_at.strftime('%B %d, %Y') }}
+                </div>
+                
+                {% if customer.last_login %}
+                <div>
+                    <strong>Last Login:</strong><br>
+                    {{ customer.last_login.strftime('%m/%d/%Y %I:%M %p') }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Payment Info</h5>
+            </div>
+            <div class="card-body">
+                {% if loc.outstanding_balance %}
+                <div class="mb-3">
+                    <strong>Outstanding Balance:</strong><br>
+                    <span class="fs-5 text-danger">${{ "{:,.2f}".format(loc.outstanding_balance) }}</span>
+                </div>
+                {% endif %}
+                
+                {% if loc.total_paid %}
+                <div class="mb-3">
+                    <strong>Total Paid:</strong><br>
+                    ${{ "{:,.2f}".format(loc.total_paid) }}
+                </div>
+                {% endif %}
+                
+                {% if loc.number_of_payments_made %}
+                <div class="mb-3">
+                    <strong>Payments Made:</strong><br>
+                    {{ loc.number_of_payments_made }}
+                </div>
+                {% endif %}
+                
+                {% if loc.number_of_payments_remaining %}
+                <div>
+                    <strong>Payments Remaining:</strong><br>
+                    {{ loc.number_of_payments_remaining }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Need Help?</h5>
+            </div>
+            <div class="card-body">
+                <p>Contact your dedicated representative for assistance.</p>
+                {% if loc.assigned_rep %}
+                <p><strong>Your Rep:</strong><br>
+                {{ loc.assigned_rep.first_name }} {{ loc.assigned_rep.last_name }}<br>
+                <a href="mailto:{{ loc.assigned_rep.email }}">{{ loc.assigned_rep.email }}</a></p>
+                {% else %}
+                <p class="text-muted">A rep will be assigned to your account shortly.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

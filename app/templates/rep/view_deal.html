@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}Deal Details - Rep{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-cash-stack"></i> Deal Details</h1>
+    <a href="{{ url_for('rep.dashboard') }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Dashboard
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Customer Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>Business Name:</strong><br>
+                        <span class="fs-5">{{ loc.customer.business_name }}</span>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Owner:</strong><br>
+                        {{ loc.customer.owner_name }}
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <strong>Email:</strong><br>
+                        <a href="mailto:{{ loc.customer.email }}">{{ loc.customer.email }}</a>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Phone:</strong><br>
+                        <a href="tel:{{ loc.customer.phone }}">{{ loc.customer.phone }}</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Line of Credit Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-4 text-center">
+                        <div class="p-3 bg-primary text-white rounded">
+                            <h6>Approved Amount</h6>
+                            <h3 class="mb-0">${{ "{:,.0f}".format(loc.approved_amount) }}</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="p-3 bg-danger text-white rounded">
+                            <h6>Used Amount</h6>
+                            <h3 class="mb-0">${{ "{:,.0f}".format(loc.used_amount) }}</h3>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="p-3 bg-success text-white rounded">
+                            <h6>Available Credit</h6>
+                            <h3 class="mb-0">${{ "{:,.0f}".format(loc.approved_amount - loc.used_amount) }}</h3>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="progress mb-4" style="height: 30px;">
+                    <div class="progress-bar bg-danger" role="progressbar" 
+                         style="width: {{ (loc.used_amount / loc.approved_amount * 100) if loc.approved_amount > 0 else 0 }}%">
+                        {{ "%.1f"|format(loc.used_amount / loc.approved_amount * 100) if loc.approved_amount > 0 else 0 }}% Utilized
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Interest Rate:</strong><br>
+                        <span class="fs-5">{{ loc.interest_rate }}% APR</span>
+                    </div>
+                    {% if loc.factor_rate %}
+                    <div class="col-md-6">
+                        <strong>Factor Rate:</strong><br>
+                        <span class="fs-5">{{ loc.factor_rate }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>Payment Frequency:</strong><br>
+                        {{ loc.payment_frequency }}
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Payment Amount:</strong><br>
+                        ${{ "{:,.2f}".format(loc.payment_amount) }}
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Term:</strong><br>
+                        {{ loc.term_months }} months
+                    </div>
+                </div>
+                
+                {% if loc.notes %}
+                <div class="mt-4 p-3 bg-light rounded">
+                    <strong>Notes:</strong><br>
+                    {{ loc.notes }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Current Status:</strong><br>
+                    {% if loc.status == 'active' %}
+                        <span class="badge bg-success fs-6">Active</span>
+                    {% elif loc.status == 'paid_off' %}
+                        <span class="badge bg-info fs-6">Paid Off</span>
+                    {% elif loc.status == 'suspended' %}
+                        <span class="badge bg-warning fs-6">Suspended</span>
+                    {% else %}
+                        <span class="badge bg-danger fs-6">Defaulted</span>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Created:</strong><br>
+                    {{ loc.created_at.strftime('%m/%d/%Y') }}
+                </div>
+                
+                {% if loc.first_payment_date %}
+                <div class="mb-3">
+                    <strong>First Payment:</strong><br>
+                    {{ loc.first_payment_date.strftime('%m/%d/%Y') }}
+                </div>
+                {% endif %}
+                
+                {% if loc.maturity_date %}
+                <div>
+                    <strong>Maturity Date:</strong><br>
+                    {{ loc.maturity_date.strftime('%m/%d/%Y') }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Quick Stats</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Utilization:</strong><br>
+                    {{ "%.1f"|format(loc.used_amount / loc.approved_amount * 100) if loc.approved_amount > 0 else 0 }}%
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Outstanding Balance:</strong><br>
+                    ${{ "{:,.2f}".format(loc.outstanding_balance) }}
+                </div>
+                
+                {% if loc.total_paid %}
+                <div>
+                    <strong>Total Paid:</strong><br>
+                    ${{ "{:,.2f}".format(loc.total_paid) }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

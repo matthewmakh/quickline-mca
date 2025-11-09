@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Applications - Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-file-text"></i> Applications</h1>
+    <div>
+        <a href="{{ url_for('admin.applications', status='all') }}" class="btn btn-sm {{ 'btn-primary' if status_filter == 'all' else 'btn-outline-primary' }}">All</a>
+        <a href="{{ url_for('admin.applications', status='pending') }}" class="btn btn-sm {{ 'btn-warning' if status_filter == 'pending' else 'btn-outline-warning' }}">Pending</a>
+        <a href="{{ url_for('admin.applications', status='approved') }}" class="btn btn-sm {{ 'btn-success' if status_filter == 'approved' else 'btn-outline-success' }}">Approved</a>
+        <a href="{{ url_for('admin.applications', status='rejected') }}" class="btn btn-sm {{ 'btn-danger' if status_filter == 'rejected' else 'btn-outline-danger' }}">Rejected</a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Business Name</th>
+                        <th>Owner</th>
+                        <th>Requested Amount</th>
+                        <th>Status</th>
+                        <th>Submitted</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for app in applications %}
+                    <tr>
+                        <td>{{ app.id }}</td>
+                        <td><strong>{{ app.business_name }}</strong></td>
+                        <td>{{ app.owner_first_name }} {{ app.owner_last_name }}</td>
+                        <td>${{ "{:,.0f}".format(app.requested_amount) }}</td>
+                        <td>
+                            {% if app.status == 'pending' %}
+                                <span class="badge bg-warning">Pending</span>
+                            {% elif app.status == 'approved' %}
+                                <span class="badge bg-success">Approved</span>
+                            {% else %}
+                                <span class="badge bg-danger">Rejected</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ app.submitted_at.strftime('%m/%d/%Y %I:%M %p') }}</td>
+                        <td>
+                            <a href="{{ url_for('admin.view_application', id=app.id) }}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

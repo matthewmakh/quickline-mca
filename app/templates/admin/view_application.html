@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+
+{% block title %}View Application - Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-file-text-fill"></i> Application #{{ application.id }}</h1>
+    <a href="{{ url_for('admin.applications') }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Business Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Business Name:</strong><br>
+                        {{ application.business_name }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Legal Name:</strong><br>
+                        {{ application.business_legal_name or 'N/A' }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>EIN:</strong><br>
+                        {{ application.ein or 'N/A' }}
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Type:</strong><br>
+                        {{ application.business_type }}
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Industry:</strong><br>
+                        {{ application.industry }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Years in Business:</strong><br>
+                        {{ application.years_in_business }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Phone:</strong><br>
+                        {{ application.business_phone }}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <strong>Address:</strong><br>
+                    {{ application.business_address }}<br>
+                    {{ application.business_city }}, {{ application.business_state }} {{ application.business_zip }}
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Financial Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Monthly Revenue:</strong><br>
+                        ${{ "{:,.2f}".format(application.monthly_revenue) }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Annual Revenue:</strong><br>
+                        ${{ "{:,.2f}".format(application.annual_revenue) }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Avg Monthly Bank Balance:</strong><br>
+                        ${{ "{:,.2f}".format(application.average_monthly_bank_balance) }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Existing Debt:</strong><br>
+                        ${{ "{:,.2f}".format(application.existing_debt or 0) }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Credit Score:</strong><br>
+                        {{ application.credit_score or 'Not provided' }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Requested Amount:</strong><br>
+                        <span class="text-primary fw-bold">${{ "{:,.2f}".format(application.requested_amount) }}</span>
+                    </div>
+                </div>
+                <div>
+                    <strong>Purpose of Funding:</strong><br>
+                    {{ application.purpose_of_funding }}
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Owner Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Name:</strong><br>
+                        {{ application.owner_first_name }} {{ application.owner_last_name }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Email:</strong><br>
+                        {{ application.owner_email }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Phone:</strong><br>
+                        {{ application.owner_phone }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Ownership:</strong><br>
+                        {{ application.ownership_percentage }}%
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>SSN (Last 4):</strong><br>
+                        ***-**-{{ application.owner_ssn_last_4 }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Date of Birth:</strong><br>
+                        {{ application.owner_date_of_birth.strftime('%m/%d/%Y') if application.owner_date_of_birth else 'N/A' }}
+                    </div>
+                </div>
+                <div>
+                    <strong>Address:</strong><br>
+                    {{ application.owner_address }}<br>
+                    {{ application.owner_city }}, {{ application.owner_state }} {{ application.owner_zip }}
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Banking Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Bank Name:</strong><br>
+                        {{ application.bank_name }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Account Type:</strong><br>
+                        {{ application.bank_account_type }}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Years with Bank:</strong><br>
+                        {{ application.time_with_bank }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Avg Daily Balance:</strong><br>
+                        ${{ "{:,.2f}".format(application.average_daily_balance) }}
+                    </div>
+                </div>
+                <div>
+                    <strong>NSF (Last 3 Months):</strong><br>
+                    {{ application.number_of_nsf_last_3_months }}
+                </div>
+            </div>
+        </div>
+
+        {% if application.has_merchant_account or application.uses_online_sales or application.has_previous_mca %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Additional Information</h5>
+            </div>
+            <div class="card-body">
+                {% if application.has_merchant_account %}
+                <div class="mb-2">
+                    <i class="bi bi-check-circle-fill text-success"></i> Has Merchant Account<br>
+                    <strong>Monthly Card Sales:</strong> ${{ "{:,.2f}".format(application.monthly_card_sales or 0) }}
+                </div>
+                {% endif %}
+                
+                {% if application.uses_online_sales %}
+                <div class="mb-2">
+                    <i class="bi bi-check-circle-fill text-success"></i> Uses Online Sales<br>
+                    <strong>Online Sales:</strong> {{ application.online_sales_percentage or 0 }}%
+                </div>
+                {% endif %}
+                
+                {% if application.has_previous_mca %}
+                <div class="mb-2">
+                    <i class="bi bi-check-circle-fill text-info"></i> Has Previous MCA<br>
+                    <strong>Details:</strong> {{ application.previous_mca_details or 'N/A' }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Current Status:</strong><br>
+                    {% if application.status == 'pending' %}
+                        <span class="badge bg-warning fs-6">Pending Review</span>
+                    {% elif application.status == 'approved' %}
+                        <span class="badge bg-success fs-6">Approved</span>
+                    {% else %}
+                        <span class="badge bg-danger fs-6">Rejected</span>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Submitted:</strong><br>
+                    {{ application.submitted_at.strftime('%m/%d/%Y %I:%M %p') }}
+                </div>
+                
+                {% if application.reviewed_at %}
+                <div class="mb-3">
+                    <strong>Reviewed:</strong><br>
+                    {{ application.reviewed_at.strftime('%m/%d/%Y %I:%M %p') }}
+                </div>
+                {% endif %}
+                
+                {% if application.notes %}
+                <div class="mb-3">
+                    <strong>Notes:</strong><br>
+                    {{ application.notes }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if application.status == 'pending' %}
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">Actions</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.approve_application', id=application.id) }}" class="mb-2">
+                    <button type="submit" class="btn btn-success w-100" onclick="return confirm('Approve this application and create customer account?')">
+                        <i class="bi bi-check-circle"></i> Approve Application
+                    </button>
+                </form>
+                
+                <form method="POST" action="{{ url_for('admin.reject_application', id=application.id) }}">
+                    <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Reject this application?')">
+                        <i class="bi bi-x-circle"></i> Reject Application
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if application.customer %}
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Customer Account</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Customer ID:</strong> {{ application.customer.id }}</p>
+                {% if application.customer.line_of_credit %}
+                <a href="{{ url_for('admin.view_deal', id=application.customer.line_of_credit.id) }}" class="btn btn-info w-100">
+                    <i class="bi bi-cash-stack"></i> View Line of Credit
+                </a>
+                {% else %}
+                <a href="{{ url_for('admin.create_line_of_credit', customer_id=application.customer.id) }}" class="btn btn-primary w-100">
+                    <i class="bi bi-plus-circle"></i> Create Line of Credit
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

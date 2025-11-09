@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+
+{% block title %}Apply for Funding - QuickLine LLC{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-10 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h2 class="mb-0"><i class="bi bi-file-text"></i> Business Funding Application</h2>
+            </div>
+            <div class="card-body">
+                <p class="lead">Complete the form below to apply for a line of credit. All fields are required unless marked optional.</p>
+                
+                <form method="POST" action="{{ url_for('main.apply') }}">
+                    {{ form.hidden_tag() }}
+                    
+                    <h4 class="mt-4 mb-3 text-primary"><i class="bi bi-building"></i> Business Information</h4>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.business_name.label(class="form-label") }}
+                            {{ form.business_name(class="form-control") }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.business_legal_name.label(class="form-label") }}
+                            {{ form.business_legal_name(class="form-control") }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            {{ form.ein.label(class="form-label") }}
+                            {{ form.ein(class="form-control") }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form.business_type.label(class="form-label") }}
+                            {{ form.business_type(class="form-select") }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form.years_in_business.label(class="form-label") }}
+                            {{ form.years_in_business(class="form-control", type="number", step="0.1") }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.industry.label(class="form-label") }}
+                            {{ form.industry(class="form-control") }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.business_phone.label(class="form-label") }}
+                            {{ form.business_phone(class="form-control") }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.business_address.label(class="form-label") }}
+                        {{ form.business_address(class="form-control") }}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.business_city.label(class="form-label") }}
+                            {{ form.business_city(class="form-control") }}
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            {{ form.business_state.label(class="form-label") }}
+                            {{ form.business_state(class="form-control", placeholder="CA") }}
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            {{ form.business_zip.label(class="form-label") }}
+                            {{ form.business_zip(class="form-control") }}
+                        </div>
+                    </div>
+                    
+                    <h4 class="mt-4 mb-3 text-primary"><i class="bi bi-cash-stack"></i> Financial Information</h4>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.monthly_revenue.label(class="form-label") }}
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                {{ form.monthly_revenue(class="form-control") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.annual_revenue.label(class="form-label") }}
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                {{ form.annual_revenue(class="form-control") }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.average_monthly_bank_balance.label(class="form-label") }}
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                {{ form.average_monthly_bank_balance(class="form-control") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.existing_debt.label(class="form-label") }}
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                {{ form.existing_debt(class="form-control") }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.credit_score.label(class="form-label") }}
+                            {{ form.credit_score(class="form-control") }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.requested_amount.label(class="form-label") }}
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                {{ form.requested_amount(class="form-control") }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.purpose_of_funding.label(class="form-label") }}
+                        {{ form.purpose_of_funding(class="form-control", rows="3") }}
+                    </div>
+                    
+                    <h4 class="mt-4 mb-3 text-primary"><i class="bi bi-person"></i> Owner Information</h4>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.owner_first_name.label(class="form-label") }}
+                            {{ form.owner_first_name(class="form-control") }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.owner_last_name.label(class="form-label") }}
+                            {{ form.owner_last_name(class="form-control") }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.owner_email.label(class="form-label") }}
+                            {{ form.owner_email(class="form-control", type="email") }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.owner_phone.label(class="form-label") }}
+                            {{ form.owner_phone(class="form-control") }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            {{ form.owner_ssn_last_4.label(class="form-label") }}
+                            {{ form.owner_ssn_last_4(class="form-control", maxlength="4") }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form.owner_date_of_birth.label(class="form-label") }}
+                            {{ form.owner_date_of_birth(class="form-control", type="date") }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form.ownership_percentage.label(class="form-label") }}
+                            <div class="input-group">
+                                {{ form.ownership_percentage(class="form-control") }}
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.owner_address.label(class="form-label") }}
+                        {{ form.owner_address(class="form-control") }}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.owner_city.label(class="form-label") }}
+                            {{ form.owner_city(class="form-control") }}
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            {{ form.owner_state.label(class="form-label") }}
+                            {{ form.owner_state(class="form-control", placeholder="CA") }}
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            {{ form.owner_zip.label(class="form-label") }}
+                            {{ form.owner_zip(class="form-control") }}
+                        </div>
+                    </div>
+                    
+                    <h4 class="mt-4 mb-3 text-primary"><i class="bi bi-bank"></i> Banking Information</h4>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            {{ form.bank_name.label(class="form-label") }}
+                            {{ form.bank_name(class="form-control") }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form.bank_account_type.label(class="form-label") }}
+                            {{ form.bank_account_type(class="form-select") }}
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            {{ form.time_with_bank.label(class="form-label") }}
+                            {{ form.time_with_bank(class="form-control", type="number", step="0.1") }}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.average_daily_balance.label(class="form-label") }}
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                {{ form.average_daily_balance(class="form-control") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.number_of_nsf_last_3_months.label(class="form-label") }}
+                            {{ form.number_of_nsf_last_3_months(class="form-control", type="number") }}
+                            <small class="text-muted">Non-Sufficient Funds</small>
+                        </div>
+                    </div>
+                    
+                    <h4 class="mt-4 mb-3 text-primary"><i class="bi bi-info-circle"></i> Additional Information</h4>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check">
+                                {{ form.has_merchant_account(class="form-check-input") }}
+                                {{ form.has_merchant_account.label(class="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.monthly_card_sales.label(class="form-label") }}
+                            <div class="input-group">
+                                <span class="input-group-text">$</span>
+                                {{ form.monthly_card_sales(class="form-control") }}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check">
+                                {{ form.uses_online_sales(class="form-check-input") }}
+                                {{ form.uses_online_sales.label(class="form-check-label") }}
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {{ form.online_sales_percentage.label(class="form-label") }}
+                            <div class="input-group">
+                                {{ form.online_sales_percentage(class="form-control") }}
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            {{ form.has_previous_mca(class="form-check-input") }}
+                            {{ form.has_previous_mca.label(class="form-check-label") }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        {{ form.previous_mca_details.label(class="form-label") }}
+                        {{ form.previous_mca_details(class="form-control", rows="3") }}
+                    </div>
+                    
+                    <div class="mt-4">
+                        {{ form.submit(class="btn btn-primary btn-lg px-5") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

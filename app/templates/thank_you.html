@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Thank You - QuickLine LLC{% endblock %}
+
+{% block content %}
+<div class="row mt-5">
+    <div class="col-md-6 mx-auto text-center">
+        <div class="card">
+            <div class="card-body p-5">
+                <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+                <h1 class="mt-4 mb-3">Application Submitted!</h1>
+                <p class="lead">Thank you for applying with QuickLine LLC.</p>
+                <p>We've received your application and our team will review it shortly. You'll receive an email confirmation and updates at the email address you provided.</p>
+                <div class="alert alert-info mt-4">
+                    <strong>What's Next?</strong><br>
+                    Our underwriting team typically reviews applications within 24-48 hours. 
+                    We'll contact you if we need any additional information.
+                </div>
+                <a href="{{ url_for('main.index') }}" class="btn btn-primary mt-3">Back to Home</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

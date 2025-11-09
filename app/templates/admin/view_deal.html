@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}View Deal - Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-cash-stack"></i> Deal #{{ loc.id }}</h1>
+    <a href="{{ url_for('admin.deals') }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Customer Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>Business Name:</strong><br>
+                        {{ loc.customer.business_name }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Owner:</strong><br>
+                        {{ loc.customer.owner_name }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Line of Credit Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>Approved Amount:</strong><br>
+                        <span class="fs-5 text-primary">${{ "{:,.2f}".format(loc.approved_amount) }}</span>
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Used Amount:</strong><br>
+                        <span class="fs-5 text-danger">${{ "{:,.2f}".format(loc.used_amount) }}</span>
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Available:</strong><br>
+                        <span class="fs-5 text-success">${{ "{:,.2f}".format(loc.approved_amount - loc.used_amount) }}</span>
+                    </div>
+                </div>
+                
+                <div class="progress mb-4" style="height: 30px;">
+                    <div class="progress-bar bg-danger" role="progressbar" 
+                         style="width: {{ (loc.used_amount / loc.approved_amount * 100) if loc.approved_amount > 0 else 0 }}%">
+                        {{ "%.1f"|format(loc.used_amount / loc.approved_amount * 100) if loc.approved_amount > 0 else 0 }}% Used
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Interest Rate:</strong><br>
+                        {{ loc.interest_rate }}% APR
+                    </div>
+                    {% if loc.factor_rate %}
+                    <div class="col-md-6">
+                        <strong>Factor Rate:</strong><br>
+                        {{ loc.factor_rate }}
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>Payment Frequency:</strong><br>
+                        {{ loc.payment_frequency }}
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Payment Amount:</strong><br>
+                        ${{ "{:,.2f}".format(loc.payment_amount) }}
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Term:</strong><br>
+                        {{ loc.term_months }} months
+                    </div>
+                </div>
+                
+                {% if loc.first_payment_date or loc.maturity_date %}
+                <div class="row">
+                    {% if loc.first_payment_date %}
+                    <div class="col-md-6">
+                        <strong>First Payment:</strong><br>
+                        {{ loc.first_payment_date.strftime('%m/%d/%Y') }}
+                    </div>
+                    {% endif %}
+                    {% if loc.maturity_date %}
+                    <div class="col-md-6">
+                        <strong>Maturity Date:</strong><br>
+                        {{ loc.maturity_date.strftime('%m/%d/%Y') }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                {% if loc.notes %}
+                <div class="mt-3">
+                    <strong>Notes:</strong><br>
+                    {{ loc.notes }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Status</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Current Status:</strong><br>
+                    {% if loc.status == 'active' %}
+                        <span class="badge bg-success fs-6">Active</span>
+                    {% elif loc.status == 'paid_off' %}
+                        <span class="badge bg-info fs-6">Paid Off</span>
+                    {% elif loc.status == 'suspended' %}
+                        <span class="badge bg-warning fs-6">Suspended</span>
+                    {% else %}
+                        <span class="badge bg-danger fs-6">Defaulted</span>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Assigned Rep:</strong><br>
+                    {% if loc.assigned_rep %}
+                        {{ loc.assigned_rep.first_name }} {{ loc.assigned_rep.last_name }}
+                    {% else %}
+                        <span class="text-muted">Unassigned</span>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Created:</strong><br>
+                    {{ loc.created_at.strftime('%m/%d/%Y') }}
+                </div>
+                
+                <div>
+                    <strong>Last Updated:</strong><br>
+                    {{ loc.updated_at.strftime('%m/%d/%Y') }}
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Actions</h5>
+            </div>
+            <div class="card-body">
+                <a href="{{ url_for('admin.edit_line_of_credit', id=loc.id) }}" class="btn btn-warning w-100 mb-2">
+                    <i class="bi bi-pencil"></i> Edit Details
+                </a>
+                
+                <a href="{{ url_for('admin.assign_rep', id=loc.id) }}" class="btn btn-info w-100 mb-2">
+                    <i class="bi bi-person-plus"></i> Assign Rep
+                </a>
+                
+                <form method="POST" action="{{ url_for('admin.delete_deal', id=loc.id) }}" class="mt-3">
+                    <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Delete this line of credit? This cannot be undone.')">
+                        <i class="bi bi-trash"></i> Delete Deal
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

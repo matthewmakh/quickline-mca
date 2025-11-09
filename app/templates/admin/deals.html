@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Deals - Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-cash-stack"></i> Deals (Lines of Credit)</h1>
+    <div>
+        <a href="{{ url_for('admin.deals', status='all') }}" class="btn btn-sm {{ 'btn-primary' if status_filter == 'all' else 'btn-outline-primary' }}">All</a>
+        <a href="{{ url_for('admin.deals', status='active') }}" class="btn btn-sm {{ 'btn-success' if status_filter == 'active' else 'btn-outline-success' }}">Active</a>
+        <a href="{{ url_for('admin.deals', status='paid_off') }}" class="btn btn-sm {{ 'btn-info' if status_filter == 'paid_off' else 'btn-outline-info' }}">Paid Off</a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Customer</th>
+                        <th>Approved Amount</th>
+                        <th>Used</th>
+                        <th>Available</th>
+                        <th>Interest Rate</th>
+                        <th>Assigned Rep</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for loc in lines_of_credit %}
+                    <tr>
+                        <td>{{ loc.id }}</td>
+                        <td><strong>{{ loc.customer.business_name }}</strong></td>
+                        <td>${{ "{:,.0f}".format(loc.approved_amount) }}</td>
+                        <td>${{ "{:,.0f}".format(loc.used_amount) }}</td>
+                        <td>${{ "{:,.0f}".format(loc.approved_amount - loc.used_amount) }}</td>
+                        <td>{{ loc.interest_rate }}%</td>
+                        <td>
+                            {% if loc.assigned_rep %}
+                                {{ loc.assigned_rep.first_name }} {{ loc.assigned_rep.last_name }}
+                            {% else %}
+                                <span class="text-muted">Unassigned</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if loc.status == 'active' %}
+                                <span class="badge bg-success">Active</span>
+                            {% elif loc.status == 'paid_off' %}
+                                <span class="badge bg-info">Paid Off</span>
+                            {% elif loc.status == 'suspended' %}
+                                <span class="badge bg-warning">Suspended</span>
+                            {% else %}
+                                <span class="badge bg-danger">Defaulted</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{{ url_for('admin.view_deal', id=loc.id) }}" class="btn btn-sm btn-primary">
+                                <i class="bi bi-eye"></i> View
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Staff Login - QuickLine LLC{% endblock %}
+
+{% block content %}
+<div class="row mt-5">
+    <div class="col-md-5 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="mb-0"><i class="bi bi-shield-lock"></i> Staff Login</h3>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" action="{{ url_for('auth.login') }}">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        {{ form.email.label(class="form-label") }}
+                        {{ form.email(class="form-control", placeholder="admin@quickline.com") }}
+                    </div>
+                    
+                    <div class="mb-4">
+                        {{ form.password.label(class="form-label") }}
+                        {{ form.password(class="form-control") }}
+                    </div>
+                    
+                    {{ form.submit(class="btn btn-primary w-100") }}
+                </form>
+                
+                <hr class="my-4">
+                <p class="text-center text-muted mb-0">
+                    <small>Are you a customer? <a href="{{ url_for('auth.customer_login') }}">Login here</a></small>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
