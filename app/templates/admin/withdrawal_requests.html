@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Withdrawal Requests - Admin{% endblock %}
+
+{% block content %}
+<h1 class="mb-4"><i class="bi bi-wallet2"></i> Withdrawal Requests</h1>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="btn-group" role="group">
+            <a href="{{ url_for('admin.withdrawal_requests', status='pending') }}" 
+               class="btn btn-{% if status_filter == 'pending' %}primary{% else %}outline-primary{% endif %}">
+                Pending
+            </a>
+            <a href="{{ url_for('admin.withdrawal_requests', status='approved') }}" 
+               class="btn btn-{% if status_filter == 'approved' %}success{% else %}outline-success{% endif %}">
+                Approved
+            </a>
+            <a href="{{ url_for('admin.withdrawal_requests', status='denied') }}" 
+               class="btn btn-{% if status_filter == 'denied' %}danger{% else %}outline-danger{% endif %}">
+                Denied
+            </a>
+            <a href="{{ url_for('admin.withdrawal_requests', status='all') }}" 
+               class="btn btn-{% if status_filter == 'all' %}secondary{% else %}outline-secondary{% endif %}">
+                All
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Customer</th>
+                        <th>Amount</th>
+                        <th>Purpose</th>
+                        <th>Available Credit</th>
+                        <th>Status</th>
+                        <th>Requested</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if requests %}
+                        {% for withdrawal in requests %}
+                        <tr>
+                            <td>#{{ withdrawal.id }}</td>
+                            <td>
+                                <strong>{{ withdrawal.customer.business_name }}</strong><br>
+                                <small class="text-muted">{{ withdrawal.customer.email }}</small>
+                            </td>
+                            <td>
+                                <strong class="text-success">${{ "{:,.2f}".format(withdrawal.requested_amount) }}</strong>
+                            </td>
+                            <td style="max-width: 200px;">
+                                <small>{{ withdrawal.purpose[:100] }}{% if withdrawal.purpose|length > 100 %}...{% endif %}</small>
+                            </td>
+                            <td>
+                                {% set loc = withdrawal.line_of_credit %}
+                                {% set available = loc.approved_amount - loc.used_amount %}
+                                <span class="{% if withdrawal.requested_amount > available %}text-danger{% else %}text-success{% endif %}">
+                                    ${{ "{:,.2f}".format(available) }}
+                                </span>
+                                {% if withdrawal.requested_amount > available %}
+                                    <br><small class="text-danger">Exceeds available!</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge 
+                                    {% if withdrawal.status == 'approved' %}bg-success
+                                    {% elif withdrawal.status == 'denied' %}bg-danger
+                                    {% else %}bg-warning{% endif %}">
+                                    {{ withdrawal.status.title() }}
+                                </span>
+                            </td>
+                            <td>
+                                <small>{{ withdrawal.created_at.strftime('%m/%d/%Y %I:%M %p') }}</small>
+                            </td>
+                            <td>
+                                {% if withdrawal.status == 'pending' %}
+                                    <form method="POST" action="{{ url_for('admin.approve_withdrawal', id=withdrawal.id) }}" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-success" 
+                                                {% if withdrawal.requested_amount > (withdrawal.line_of_credit.approved_amount - withdrawal.line_of_credit.used_amount) %}
+                                                    onclick="return confirm('This request exceeds available credit. Approve anyway?')"
+                                                {% else %}
+                                                    onclick="return confirm('Approve this withdrawal?')"
+                                                {% endif %}>
+                                            <i class="bi bi-check-circle"></i> Approve
+                                        </button>
+                                    </form>
+                                    <button type="button" class="btn btn-sm btn-danger" 
+                                            data-bs-toggle="modal" data-bs-target="#denyModal{{ withdrawal.id }}">
+                                        <i class="bi bi-x-circle"></i> Deny
+                                    </button>
+                                    
+                                    <!-- Deny Modal -->
+                                    <div class="modal fade" id="denyModal{{ withdrawal.id }}" tabindex="-1">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Deny Withdrawal Request</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                </div>
+                                                <form method="POST" action="{{ url_for('admin.deny_withdrawal', id=withdrawal.id) }}">
+                                                    <div class="modal-body">
+                                                        <p>Denying withdrawal for <strong>${{ "{:,.2f}".format(withdrawal.requested_amount) }}</strong></p>
+                                                        <div class="mb-3">
+                                                            <label class="form-label">Reason for Denial</label>
+                                                            <textarea name="reason" class="form-control" rows="3" required 
+                                                                      placeholder="Enter reason..."></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                        <button type="submit" class="btn btn-danger">Deny Request</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    {% if withdrawal.reviewed_by %}
+                                        <small class="text-muted">
+                                            {{ withdrawal.status.title() }} by {{ withdrawal.reviewed_by.username }}<br>
+                                            {{ withdrawal.reviewed_at.strftime('%m/%d/%Y') }}
+                                        </small>
+                                        {% if withdrawal.denial_reason %}
+                                            <br><small class="text-danger"><strong>Reason:</strong> {{ withdrawal.denial_reason }}</small>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-4">
+                                No withdrawal requests found.
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

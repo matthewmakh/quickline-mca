@@ -116,3 +116,17 @@ class CustomerPasswordForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Create Customer Login')
+
+
+class ChangeCustomerPasswordForm(FlaskForm):
+    """Form for admin/rep to change customer password"""
+    new_password = PasswordField('New Password', validators=[DataRequired(), Length(min=6)])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('new_password')])
+    submit = SubmitField('Change Password')
+
+
+class WithdrawalRequestForm(FlaskForm):
+    """Form for customer to request withdrawal from line of credit"""
+    requested_amount = FloatField('Withdrawal Amount', validators=[DataRequired(), NumberRange(min=0.01)])
+    purpose = TextAreaField('Purpose of Withdrawal', validators=[DataRequired()])
+    submit = SubmitField('Submit Request')

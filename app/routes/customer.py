@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, session
-from app.models import Customer, LineOfCredit
+from app.models import Customer, LineOfCredit, WithdrawalRequest
+from app.forms import WithdrawalRequestForm
 from app import db
+from app.utils import log_activity
 
 bp = Blueprint('customer', __name__, url_prefix='/customer')
 
@@ -55,3 +57,58 @@ def details():
         return redirect(url_for('customer.dashboard'))
     
     return render_template('customer/details.html', customer=customer, loc=loc)
+
+
+@bp.route('/request-withdrawal', methods=['GET', 'POST'])
+@customer_login_required
+def request_withdrawal():
+    """Customer requests withdrawal from line of credit"""
+    customer_id = session.get('customer_id')
+    customer = Customer.query.get_or_404(customer_id)
+    loc = customer.line_of_credit
+    
+    if not loc or loc.status != 'active':
+        flash('You do not have an active line of credit.', 'error')
+        return redirect(url_for('customer.dashboard'))
+    
+    form = WithdrawalRequestForm()
+    
+    if form.validate_on_submit():
+        requested_amount = form.requested_amount.data
+        
+        # Calculate available credit
+        loc.calculate_available_amount()
+        available_credit = loc.available_amount
+        
+        # Check if requested amount exceeds available credit
+        if requested_amount > available_credit:
+            flash(f'Requested amount ${requested_amount:,.2f} exceeds available credit ${available_credit:,.2f}', 'error')
+            return render_template('customer/request_withdrawal.html', form=form, loc=loc, customer=customer)
+        
+        # Create withdrawal request
+        withdrawal = WithdrawalRequest(
+            line_of_credit_id=loc.id,
+            customer_id=customer.id,
+            requested_amount=requested_amount,
+            purpose=form.purpose.data,
+            status='pending'
+        )
+        
+        db.session.add(withdrawal)
+        db.session.commit()
+        
+        # Log activity
+        log_activity(
+            action_type='withdrawal_requested',
+            description=f'Customer {customer.business_name} requested withdrawal of ${requested_amount:,.2f}',
+            customer_id=customer.id,
+            line_of_credit_id=loc.id
+        )
+        
+        flash(f'Withdrawal request for ${requested_amount:,.2f} submitted successfully! Your rep will review it shortly.', 'success')
+        return redirect(url_for('customer.dashboard'))
+    
+    # Calculate available credit for display
+    loc.calculate_available_amount()
+    
+    return render_template('customer/request_withdrawal.html', form=form, loc=loc, customer=customer)

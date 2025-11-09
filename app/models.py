@@ -190,3 +190,59 @@ class LineOfCredit(db.Model):
     
     def __repr__(self):
         return f'<LineOfCredit ${self.approved_amount} for Customer {self.customer_id}>'
+
+
+class ActivityLog(db.Model):
+    """Log all important activities on the platform"""
+    __tablename__ = 'activity_logs'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    action_type = db.Column(db.String(50), nullable=False, index=True)  # e.g., 'application_submitted', 'application_approved', 'password_changed', 'withdrawal_requested', 'withdrawal_approved'
+    description = db.Column(db.Text, nullable=False)
+    
+    # Who performed the action
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)  # If action was by admin/rep
+    user = db.relationship('User', backref='activity_logs')
+    
+    customer_id = db.Column(db.Integer, db.ForeignKey('customers.id'), nullable=True)  # If action was by customer
+    customer = db.relationship('Customer', backref='activity_logs')
+    
+    # Related entities
+    application_id = db.Column(db.Integer, db.ForeignKey('applications.id'), nullable=True)
+    line_of_credit_id = db.Column(db.Integer, db.ForeignKey('lines_of_credit.id'), nullable=True)
+    
+    # Additional data (JSON format)
+    extra_data = db.Column(db.Text)  # Can store JSON data for extra details
+    
+    # Timestamp
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    
+    def __repr__(self):
+        return f'<ActivityLog {self.action_type} at {self.created_at}>'
+
+
+class WithdrawalRequest(db.Model):
+    """Customer requests to withdraw from line of credit"""
+    __tablename__ = 'withdrawal_requests'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    line_of_credit_id = db.Column(db.Integer, db.ForeignKey('lines_of_credit.id'), nullable=False)
+    line_of_credit = db.relationship('LineOfCredit', backref='withdrawal_requests')
+    
+    customer_id = db.Column(db.Integer, db.ForeignKey('customers.id'), nullable=False)
+    customer = db.relationship('Customer', backref='withdrawal_requests')
+    
+    requested_amount = db.Column(db.Float, nullable=False)
+    purpose = db.Column(db.Text)
+    status = db.Column(db.String(20), default='pending', index=True)  # pending, approved, denied
+    
+    # Approval/Denial info
+    reviewed_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    reviewed_by = db.relationship('User', backref='reviewed_withdrawals')
+    reviewed_at = db.Column(db.DateTime)
+    denial_reason = db.Column(db.Text)
+    
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    
+    def __repr__(self):
+        return f'<WithdrawalRequest ${self.requested_amount} - {self.status}>'

@@ -36,6 +36,9 @@
                         </td>
                         <td>{{ customer.created_at.strftime('%m/%d/%Y') }}</td>
                         <td>
+                            <a href="{{ url_for('admin.view_customer_password', id=customer.id) }}" class="btn btn-sm btn-info" title="View/Change Password">
+                                <i class="bi bi-key"></i> Password
+                            </a>
                             {% if customer.line_of_credit %}
                                 <a href="{{ url_for('admin.view_deal', id=customer.line_of_credit.id) }}" class="btn btn-sm btn-primary">
                                     <i class="bi bi-cash-stack"></i> View LOC

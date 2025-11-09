@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Request Withdrawal - Customer Portal{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-cash-coin"></i> Request Withdrawal</h1>
+    <a href="{{ url_for('customer.dashboard') }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Dashboard
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="alert alert-info">
+            <h5><i class="bi bi-info-circle"></i> Available Credit</h5>
+            <p class="mb-2"><strong>Total Credit Line:</strong> ${{ "{:,.2f}".format(loc.approved_amount) }}</p>
+            <p class="mb-2"><strong>Currently Used:</strong> ${{ "{:,.2f}".format(loc.used_amount) }}</p>
+            <p class="mb-0"><strong>Available for Withdrawal:</strong> 
+                <span class="fs-4 text-success">${{ "{:,.2f}".format(loc.available_amount) }}</span>
+            </p>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-wallet2"></i> Withdrawal Request</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        {{ form.requested_amount.label(class="form-label") }}
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            {{ form.requested_amount(class="form-control", placeholder="Enter amount") }}
+                        </div>
+                        {% if form.requested_amount.errors %}
+                            <div class="text-danger small">
+                                {% for error in form.requested_amount.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                        <small class="text-muted">Maximum: ${{ "{:,.2f}".format(loc.available_amount) }}</small>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.purpose.label(class="form-label") }}
+                        {{ form.purpose(class="form-control", rows=4, placeholder="Describe how you will use these funds...") }}
+                        {% if form.purpose.errors %}
+                            <div class="text-danger small">
+                                {% for error in form.purpose.errors %}{{ error }}{% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Note:</strong> Your withdrawal request will be reviewed by your assigned rep. 
+                        You will be notified once it's approved or if more information is needed.
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        {{ form.submit(class="btn btn-primary btn-lg") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

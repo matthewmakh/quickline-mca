@@ -1,12 +1,13 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session
 from flask_login import login_required, current_user
-from app.models import Application, User, Customer, LineOfCredit
-from app.forms import CreateUserForm, LineOfCreditForm, AssignRepForm, CustomerPasswordForm
+from app.models import Application, User, Customer, LineOfCredit, ActivityLog, WithdrawalRequest
+from app.forms import CreateUserForm, LineOfCreditForm, AssignRepForm, CustomerPasswordForm, ChangeCustomerPasswordForm
 from app import db
 from datetime import datetime
 from functools import wraps
 import secrets
 import string
+from app.utils import log_activity
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -37,6 +38,8 @@ def dashboard():
     active_deals = LineOfCredit.query.filter_by(status='active').count()
     total_credit_issued = db.session.query(db.func.sum(LineOfCredit.approved_amount)).filter_by(status='active').scalar() or 0
     
+    pending_withdrawals = WithdrawalRequest.query.filter_by(status='pending').count()
+    
     reps = User.query.filter_by(role='rep', is_active=True).all()
     
     return render_template('admin/dashboard.html',
@@ -48,6 +51,7 @@ def dashboard():
                          rejected_count=rejected_count,
                          active_deals=active_deals,
                          total_credit_issued=total_credit_issued,
+                         pending_withdrawals=pending_withdrawals,
                          reps=reps)
 
 
@@ -108,6 +112,14 @@ def approve_application(id):
     
     db.session.add(customer)
     db.session.commit()
+    
+    # Log activity
+    log_activity(
+        action_type='application_approved',
+        description=f'Application #{application.id} for {application.business_name} approved by {current_user.username}',
+        application_id=application.id,
+        customer_id=customer.id
+    )
     
     # Store password in session to show on next page
     session['new_customer_password'] = generated_password
@@ -381,3 +393,141 @@ def delete_customer(id):
     
     flash(f'Customer {business_name} has been deleted.', 'info')
     return redirect(url_for('admin.customers'))
+
+
+@bp.route('/customers/<int:id>/password', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def view_customer_password(id):
+    """View and change customer password"""
+    customer = Customer.query.get_or_404(id)
+    form = ChangeCustomerPasswordForm()
+    
+    # Generate a new random password if requested
+    generated_password = None
+    if request.args.get('generate') == 'true':
+        alphabet = string.ascii_letters + string.digits
+        generated_password = ''.join(secrets.choice(alphabet) for i in range(12))
+        flash(f'New password generated: {generated_password}', 'info')
+    
+    if form.validate_on_submit():
+        customer.set_password(form.new_password.data)
+        db.session.commit()
+        
+        # Log activity
+        log_activity(
+            action_type='password_changed',
+            description=f'Password changed for customer {customer.business_name} by {current_user.username}',
+            customer_id=customer.id
+        )
+        
+        flash(f'Password changed successfully for {customer.business_name}!', 'success')
+        return redirect(url_for('admin.customers'))
+    
+    return render_template('admin/customer_password.html', customer=customer, form=form, generated_password=generated_password)
+
+
+@bp.route('/activity-logs')
+@login_required
+@admin_required
+def activity_logs():
+    """View all activity logs"""
+    page = request.args.get('page', 1, type=int)
+    action_type_filter = request.args.get('type', 'all')
+    
+    query = ActivityLog.query
+    
+    if action_type_filter != 'all':
+        query = query.filter_by(action_type=action_type_filter)
+    
+    logs = query.order_by(ActivityLog.created_at.desc()).paginate(page=page, per_page=50, error_out=False)
+    
+    # Get unique action types for filter
+    action_types = db.session.query(ActivityLog.action_type).distinct().all()
+    action_types = [at[0] for at in action_types]
+    
+    return render_template('admin/activity_logs.html', logs=logs, action_types=action_types, action_type_filter=action_type_filter)
+
+
+@bp.route('/withdrawal-requests')
+@login_required
+@admin_required
+def withdrawal_requests():
+    """View all pending withdrawal requests"""
+    status_filter = request.args.get('status', 'pending')
+    
+    query = WithdrawalRequest.query
+    
+    if status_filter != 'all':
+        query = query.filter_by(status=status_filter)
+    
+    requests = query.order_by(WithdrawalRequest.created_at.desc()).all()
+    
+    return render_template('admin/withdrawal_requests.html', requests=requests, status_filter=status_filter)
+
+
+@bp.route('/withdrawal-request/<int:id>/approve', methods=['POST'])
+@login_required
+@admin_required
+def approve_withdrawal(id):
+    """Approve withdrawal request"""
+    withdrawal = WithdrawalRequest.query.get_or_404(id)
+    
+    if withdrawal.status != 'pending':
+        flash('This withdrawal request has already been processed.', 'warning')
+        return redirect(url_for('admin.withdrawal_requests'))
+    
+    # Update line of credit used amount
+    loc = withdrawal.line_of_credit
+    loc.used_amount += withdrawal.requested_amount
+    loc.calculate_available_amount()
+    
+    # Update withdrawal request
+    withdrawal.status = 'approved'
+    withdrawal.reviewed_by_id = current_user.id
+    withdrawal.reviewed_at = datetime.utcnow()
+    
+    db.session.commit()
+    
+    # Log activity
+    log_activity(
+        action_type='withdrawal_approved',
+        description=f'Withdrawal request #{withdrawal.id} for ${withdrawal.requested_amount:,.2f} approved by {current_user.username}',
+        customer_id=withdrawal.customer_id,
+        line_of_credit_id=withdrawal.line_of_credit_id
+    )
+    
+    flash(f'Withdrawal request for ${withdrawal.requested_amount:,.2f} approved! Customer has been notified.', 'success')
+    return redirect(url_for('admin.withdrawal_requests'))
+
+
+@bp.route('/withdrawal-request/<int:id>/deny', methods=['POST'])
+@login_required
+@admin_required
+def deny_withdrawal(id):
+    """Deny withdrawal request"""
+    withdrawal = WithdrawalRequest.query.get_or_404(id)
+    
+    if withdrawal.status != 'pending':
+        flash('This withdrawal request has already been processed.', 'warning')
+        return redirect(url_for('admin.withdrawal_requests'))
+    
+    reason = request.form.get('reason', 'No reason provided')
+    
+    withdrawal.status = 'denied'
+    withdrawal.reviewed_by_id = current_user.id
+    withdrawal.reviewed_at = datetime.utcnow()
+    withdrawal.denial_reason = reason
+    
+    db.session.commit()
+    
+    # Log activity
+    log_activity(
+        action_type='withdrawal_denied',
+        description=f'Withdrawal request #{withdrawal.id} for ${withdrawal.requested_amount:,.2f} denied by {current_user.username}. Reason: {reason}',
+        customer_id=withdrawal.customer_id,
+        line_of_credit_id=withdrawal.line_of_credit_id
+    )
+    
+    flash(f'Withdrawal request denied.', 'info')
+    return redirect(url_for('admin.withdrawal_requests'))
