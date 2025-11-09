@@ -1,10 +1,12 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, session
 from flask_login import login_required, current_user
 from app.models import Application, User, Customer, LineOfCredit
 from app.forms import CreateUserForm, LineOfCreditForm, AssignRepForm, CustomerPasswordForm
 from app import db
 from datetime import datetime
 from functools import wraps
+import secrets
+import string
 
 bp = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -88,6 +90,10 @@ def approve_application(id):
     application.status = 'approved'
     application.reviewed_at = datetime.utcnow()
     
+    # Generate a secure random password
+    alphabet = string.ascii_letters + string.digits
+    generated_password = ''.join(secrets.choice(alphabet) for i in range(12))
+    
     # Create customer account
     customer = Customer(
         application_id=application.id,
@@ -97,13 +103,18 @@ def approve_application(id):
         phone=application.business_phone
     )
     
-    # Set a temporary password (should be changed by customer)
-    customer.set_password('TempPass123!')
+    # Set the generated password
+    customer.set_password(generated_password)
     
     db.session.add(customer)
     db.session.commit()
     
-    flash(f'Application approved! Customer account created for {application.business_name}. Temporary password: TempPass123!', 'success')
+    # Store password in session to show on next page
+    session['new_customer_password'] = generated_password
+    session['new_customer_email'] = application.owner_email
+    session['new_customer_business'] = application.business_name
+    
+    flash(f'Application approved! Customer account created for {application.business_name}.', 'success')
     return redirect(url_for('admin.create_line_of_credit', customer_id=customer.id))
 
 

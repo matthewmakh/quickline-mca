@@ -12,6 +12,19 @@
             <div class="card-body">
                 <p class="lead">Complete the form below to apply for a line of credit. All fields are required unless marked optional.</p>
                 
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                    <h5><i class="bi bi-exclamation-triangle"></i> Please fix the following errors:</h5>
+                    <ul>
+                    {% for field, errors in form.errors.items() %}
+                        {% for error in errors %}
+                            <li><strong>{{ form[field].label.text }}:</strong> {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+                
                 <form method="POST" action="{{ url_for('main.apply') }}">
                     {{ form.hidden_tag() }}
                     
@@ -214,8 +227,8 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             {{ form.number_of_nsf_last_3_months.label(class="form-label") }}
-                            {{ form.number_of_nsf_last_3_months(class="form-control", type="number") }}
-                            <small class="text-muted">Non-Sufficient Funds</small>
+                            {{ form.number_of_nsf_last_3_months(class="form-control", type="number", min="0", value="0") }}
+                            <small class="text-muted">Non-Sufficient Funds (enter 0 if none)</small>
                         </div>
                     </div>
                     

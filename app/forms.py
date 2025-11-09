@@ -51,7 +51,7 @@ class ApplicationForm(FlaskForm):
                                    validators=[DataRequired()])
     time_with_bank = FloatField('Years with Bank', validators=[DataRequired(), NumberRange(min=0)])
     average_daily_balance = FloatField('Average Daily Balance', validators=[DataRequired(), NumberRange(min=0)])
-    number_of_nsf_last_3_months = IntegerField('NSF Occurrences (Last 3 Months)', validators=[DataRequired(), NumberRange(min=0)])
+    number_of_nsf_last_3_months = IntegerField('NSF Occurrences (Last 3 Months)', validators=[Optional(), NumberRange(min=0)], default=0)
     
     # Additional Information
     has_merchant_account = BooleanField('Do you have a merchant account?')
