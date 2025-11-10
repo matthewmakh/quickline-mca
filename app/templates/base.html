@@ -48,14 +48,23 @@
             font-size: 1.5rem;
             color: white !important;
             transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .navbar-logo {
+            height: 40px;
+            width: auto;
+            transition: transform 0.3s ease;
         }
         
         .navbar-brand:hover {
             transform: scale(1.05);
         }
         
-        .navbar-brand i {
-            animation: rotate 3s ease-in-out infinite;
+        .navbar-brand:hover .navbar-logo {
+            transform: rotate(5deg);
         }
         
         @keyframes rotate {
@@ -262,7 +271,8 @@
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('main.index') }}">
-                <i class="bi bi-lightning-charge-fill"></i> QuickLine LLC
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="QuickLine LLC" class="navbar-logo">
+                QuickLine LLC
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
