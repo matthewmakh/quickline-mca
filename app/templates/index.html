@@ -1,69 +1,1280 @@
 {% extends "base.html" %}
 
-{% block title %}Home - QuickLine LLC{% endblock %}
+{% block title %}QuickLine LLC - Fast Business Funding Solutions{% endblock %}
 
 {% block content %}
-<div class="row mt-5">
-    <div class="col-lg-6 mx-auto text-center">
-        <h1 class="display-4 fw-bold mb-4" style="color: var(--primary-color);">
-            <i class="bi bi-graph-up-arrow"></i> Grow Your Business Today
-        </h1>
-        <p class="lead mb-4">
-            Access flexible lines of credit designed for your business needs. 
-            Quick approval, competitive rates, and dedicated support.
-        </p>
-        <a href="{{ url_for('main.apply') }}" class="btn btn-primary btn-lg px-5 py-3">
-            <i class="bi bi-file-text"></i> Apply for Funding
-        </a>
-        <a href="{{ url_for('auth.customer_login') }}" class="btn btn-outline-primary btn-lg px-5 py-3 ms-3">
-            <i class="bi bi-person-circle"></i> Customer Login
-        </a>
-    </div>
-</div>
-
-<div class="row mt-5 pt-5">
-    <div class="col-md-4 text-center mb-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <i class="bi bi-lightning-charge-fill text-primary" style="font-size: 3rem;"></i>
-                <h3 class="mt-3">Fast Approval</h3>
-                <p class="text-muted">Get approved in as little as 24 hours with our streamlined process.</p>
+<!-- Hero Section -->
+<div class="hero-section" id="home">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-3 fw-bold mb-4 hero-title">
+                    Get Funding For Your Business <span class="text-orange">Fast</span>
+                </h1>
+                <p class="lead mb-4 hero-subtitle">
+                    Access capital quickly with our streamlined Merchant Cash Advance solutions. 
+                    No hidden fees, transparent terms, and funding in as little as 24 hours.
+                </p>
+                <div class="hero-cta">
+                    <a href="{{ url_for('main.apply') }}" class="btn btn-lg btn-primary me-3 mb-2">
+                        <i class="bi bi-file-earmark-text me-2"></i>Apply Now
+                    </a>
+                    <a href="#how-it-works" class="btn btn-lg btn-outline-primary mb-2">
+                        <i class="bi bi-info-circle me-2"></i>Learn More
+                    </a>
+                </div>
+                <div class="hero-features mt-4">
+                    <div class="feature-item">
+                        <i class="bi bi-check-circle-fill text-success"></i>
+                        <span>Fast Approval</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="bi bi-check-circle-fill text-success"></i>
+                        <span>Flexible Terms</span>
+                    </div>
+                    <div class="feature-item">
+                        <i class="bi bi-check-circle-fill text-success"></i>
+                        <span>No Collateral</span>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    <div class="col-md-4 text-center mb-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <i class="bi bi-shield-check text-success" style="font-size: 3rem;"></i>
-                <h3 class="mt-3">Flexible Terms</h3>
-                <p class="text-muted">Lines of credit tailored to your business cash flow and needs.</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4 text-center mb-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <i class="bi bi-headset text-warning" style="font-size: 3rem;"></i>
-                <h3 class="mt-3">Dedicated Support</h3>
-                <p class="text-muted">Your personal rep is here to help you every step of the way.</p>
+            <div class="col-lg-6 d-none d-lg-block">
+                <div class="hero-image">
+                    <i class="bi bi-graph-up-arrow"></i>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row mt-5 pt-4">
-    <div class="col-lg-8 mx-auto">
-        <div class="card bg-light">
-            <div class="card-body text-center p-5">
-                <h2 class="mb-4">Why Choose QuickLine LLC?</h2>
-                <ul class="list-unstyled text-start">
-                    <li class="mb-3"><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>Lines of Credit Only</strong> - Access funds when you need them</li>
-                    <li class="mb-3"><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>Competitive Rates</strong> - Transparent pricing with no hidden fees</li>
-                    <li class="mb-3"><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>Business Expertise</strong> - Years of experience in merchant cash advances</li>
-                    <li class="mb-3"><i class="bi bi-check-circle-fill text-success me-2"></i> <strong>Online Portal</strong> - Track your credit line 24/7</li>
-                </ul>
+<!-- Stats Section -->
+<div class="stats-section">
+    <div class="container">
+        <div class="row text-center">
+            <div class="col-md-3 col-6 mb-4">
+                <div class="stat-box">
+                    <div class="stat-icon">
+                        <i class="bi bi-currency-dollar"></i>
+                    </div>
+                    <h2 class="stat-number">$500M+</h2>
+                    <p class="stat-label">Funded to Date</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-4">
+                <div class="stat-box">
+                    <div class="stat-icon">
+                        <i class="bi bi-briefcase"></i>
+                    </div>
+                    <h2 class="stat-number">10,000+</h2>
+                    <p class="stat-label">Businesses Served</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-4">
+                <div class="stat-box">
+                    <div class="stat-icon">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                    <h2 class="stat-number">24 Hours</h2>
+                    <p class="stat-label">Average Funding Time</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-4">
+                <div class="stat-box">
+                    <div class="stat-icon">
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                    <h2 class="stat-number">4.9/5</h2>
+                    <p class="stat-label">Customer Rating</p>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- How It Works Section -->
+<div class="how-it-works-section" id="how-it-works">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">How It Works</h2>
+            <p class="section-subtitle">Get funded in three simple steps</p>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </div>
+                    <h3 class="step-title">Apply Online</h3>
+                    <p class="step-description">
+                        Complete our simple online application in minutes. 
+                        We only need basic business information to get started.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                    <h3 class="step-title">Get Approved</h3>
+                    <p class="step-description">
+                        Our team reviews your application and provides a decision 
+                        within hours. Most applications are approved same day.
+                    </p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">
+                        <i class="bi bi-cash-stack"></i>
+                    </div>
+                    <h3 class="step-title">Receive Funds</h3>
+                    <p class="step-description">
+                        Once approved, funds are deposited directly into your 
+                        business account as fast as 24 hours.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Benefits Section -->
+<div class="benefits-section" id="benefits">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Why Choose QuickLine?</h2>
+            <p class="section-subtitle">We make business funding simple and transparent</p>
+        </div>
+        <div class="row">
+            <div class="col-lg-6 mb-4">
+                <div class="benefit-card">
+                    <div class="benefit-icon bg-primary">
+                        <i class="bi bi-lightning-charge"></i>
+                    </div>
+                    <div class="benefit-content">
+                        <h4 class="benefit-title">Lightning Fast</h4>
+                        <p class="benefit-description">
+                            Get approved in hours, not days. Our streamlined process 
+                            means you can access capital when you need it most.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-4">
+                <div class="benefit-card">
+                    <div class="benefit-icon bg-orange">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <div class="benefit-content">
+                        <h4 class="benefit-title">No Hidden Fees</h4>
+                        <p class="benefit-description">
+                            Complete transparency in pricing. What you see is what you 
+                            get - no surprises or hidden charges.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-4">
+                <div class="benefit-card">
+                    <div class="benefit-icon bg-primary">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                    <div class="benefit-content">
+                        <h4 class="benefit-title">Flexible Repayment</h4>
+                        <p class="benefit-description">
+                            Repayment is tied to your daily sales, so you pay more 
+                            when business is good and less when it's slow.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-4">
+                <div class="benefit-card">
+                    <div class="benefit-icon bg-orange">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <div class="benefit-content">
+                        <h4 class="benefit-title">Dedicated Support</h4>
+                        <p class="benefit-description">
+                            Work with a dedicated representative who understands your 
+                            business and is committed to your success.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Technology Section -->
+<div class="technology-section">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Powered by Advanced Technology</h2>
+            <p class="section-subtitle">Cutting-edge fintech solutions for modern businesses</p>
+        </div>
+        <div class="row align-items-center mb-5">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <div class="tech-feature-large">
+                    <div class="tech-icon-large">
+                        <i class="bi bi-cpu"></i>
+                    </div>
+                    <h3>AI-Powered Approval Engine</h3>
+                    <p>
+                        Our proprietary machine learning algorithms analyze hundreds of data points 
+                        in real-time to provide instant credit decisions. This means faster approvals 
+                        and more accurate risk assessment for your business.
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <div class="tech-feature-small">
+                            <i class="bi bi-shield-lock-fill"></i>
+                            <div>
+                                <h5>Bank-Level Security</h5>
+                                <p>256-bit SSL encryption & SOC 2 compliant</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <div class="tech-feature-small">
+                            <i class="bi bi-speedometer2"></i>
+                            <div>
+                                <h5>Real-Time Processing</h5>
+                                <p>Instant application updates & live tracking</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="tech-feature-small">
+                            <i class="bi bi-cloud-check"></i>
+                            <div>
+                                <h5>Cloud-Based Platform</h5>
+                                <p>Access your account 24/7 from anywhere</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Trust & Security Section -->
+<div class="trust-section">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title text-white">Your Security is Our Priority</h2>
+            <p class="section-subtitle text-white opacity-90">Industry-leading security measures protect your data</p>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="trust-card">
+                    <div class="trust-icon">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <h4>Bank-Level Encryption</h4>
+                    <p>
+                        All data transmitted through our platform is protected with 256-bit SSL 
+                        encryption, the same technology used by major financial institutions.
+                    </p>
+                    <div class="trust-badge">
+                        <i class="bi bi-patch-check-fill"></i> Certified Secure
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="trust-card">
+                    <div class="trust-icon">
+                        <i class="bi bi-file-lock2"></i>
+                    </div>
+                    <h4>Privacy Guaranteed</h4>
+                    <p>
+                        We never sell or share your information. Your business data remains 
+                        confidential and is only used to process your application.
+                    </p>
+                    <div class="trust-badge">
+                        <i class="bi bi-patch-check-fill"></i> GDPR Compliant
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="trust-card">
+                    <div class="trust-icon">
+                        <i class="bi bi-graph-up-arrow"></i>
+                    </div>
+                    <h4>10+ Years Experience</h4>
+                    <p>
+                        Over a decade of helping businesses succeed. Our track record speaks 
+                        for itself with billions in successful funding transactions.
+                    </p>
+                    <div class="trust-badge">
+                        <i class="bi bi-patch-check-fill"></i> BBB Accredited
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Testimonials Section -->
+<div class="testimonials-section" id="testimonials">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">What Our Clients Say</h2>
+            <p class="section-subtitle">Real stories from businesses we've helped grow</p>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                    <p class="testimonial-text">
+                        "QuickLine provided us with the capital we needed in less than 24 hours. 
+                        The process was seamless, and our dedicated rep was incredibly helpful. 
+                        We've since expanded to three new locations!"
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">JM</div>
+                        <div>
+                            <strong>Jessica Martinez</strong>
+                            <div class="text-muted">Owner, Martinez Restaurant Group</div>
+                        </div>
+                    </div>
+                    <div class="testimonial-impact">
+                        <i class="bi bi-graph-up"></i> Revenue increased by 180%
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                    <p class="testimonial-text">
+                        "After being rejected by traditional banks, QuickLine gave us a chance. 
+                        Their flexible terms and understanding of our business model made all the 
+                        difference. We doubled our team in 6 months!"
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">RC</div>
+                        <div>
+                            <strong>Robert Chen</strong>
+                            <div class="text-muted">CEO, TechFlow Solutions</div>
+                        </div>
+                    </div>
+                    <div class="testimonial-impact">
+                        <i class="bi bi-people"></i> Team grew from 8 to 16 employees
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+                    <p class="testimonial-text">
+                        "The transparency and speed of QuickLine's platform is unmatched. 
+                        I could track my application in real-time and had funds in my account 
+                        the next day. This is how financing should work!"
+                    </p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">SK</div>
+                        <div>
+                            <strong>Sarah Kim</strong>
+                            <div class="text-muted">Founder, Urban Boutique</div>
+                        </div>
+                    </div>
+                    <div class="testimonial-impact">
+                        <i class="bi bi-cart"></i> Online sales tripled in 4 months
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Industries Section -->
+<div class="industries-section">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">We Serve All Industries</h2>
+            <p class="section-subtitle">Tailored funding solutions for your business type</p>
+        </div>
+        <div class="row">
+            <div class="col-md-3 col-6 mb-4">
+                <div class="industry-card">
+                    <i class="bi bi-shop"></i>
+                    <h5>Retail</h5>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-4">
+                <div class="industry-card">
+                    <i class="bi bi-cup-hot"></i>
+                    <h5>Restaurants</h5>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-4">
+                <div class="industry-card">
+                    <i class="bi bi-laptop"></i>
+                    <h5>Technology</h5>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-4">
+                <div class="industry-card">
+                    <i class="bi bi-truck"></i>
+                    <h5>Transportation</h5>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-4">
+                <div class="industry-card">
+                    <i class="bi bi-hammer"></i>
+                    <h5>Construction</h5>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-4">
+                <div class="industry-card">
+                    <i class="bi bi-heart-pulse"></i>
+                    <h5>Healthcare</h5>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-4">
+                <div class="industry-card">
+                    <i class="bi bi-scissors"></i>
+                    <h5>Services</h5>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 mb-4">
+                <div class="industry-card">
+                    <i class="bi bi-building"></i>
+                    <h5>Wholesale</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FAQ Section -->
+<div class="faq-section" id="faq">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            <p class="section-subtitle">Get answers to common questions about our funding process</p>
+        </div>
+        <div class="row">
+            <div class="col-lg-6 mb-4">
+                <div class="faq-card">
+                    <h5 class="faq-question">
+                        <i class="bi bi-question-circle"></i>
+                        How fast can I get funded?
+                    </h5>
+                    <p class="faq-answer">
+                        Most applications are approved within hours, and funds are typically 
+                        deposited within 24 hours of approval. In urgent cases, we can expedite 
+                        same-day funding.
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-4">
+                <div class="faq-card">
+                    <h5 class="faq-question">
+                        <i class="bi bi-question-circle"></i>
+                        What are the minimum requirements?
+                    </h5>
+                    <p class="faq-answer">
+                        Your business should be operational for at least 6 months with minimum 
+                        monthly revenue of $10,000. We consider various factors beyond credit score.
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-4">
+                <div class="faq-card">
+                    <h5 class="faq-question">
+                        <i class="bi bi-question-circle"></i>
+                        Do you check personal credit?
+                    </h5>
+                    <p class="faq-answer">
+                        We review personal credit as part of our evaluation, but we focus more 
+                        on your business performance and cash flow. Many clients with less-than-perfect 
+                        credit have been approved.
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-4">
+                <div class="faq-card">
+                    <h5 class="faq-question">
+                        <i class="bi bi-question-circle"></i>
+                        Is there a prepayment penalty?
+                    </h5>
+                    <p class="faq-answer">
+                        No, there are no prepayment penalties. You can pay off your advance early 
+                        without any additional fees, potentially saving on factor costs.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA Section -->
+<div class="cta-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 text-center text-lg-start mb-4 mb-lg-0">
+                <h2 class="cta-title mb-3">Ready to Grow Your Business?</h2>
+                <p class="cta-subtitle mb-0">
+                    Join thousands of businesses that have trusted QuickLine for their funding needs.
+                    Apply now and get a decision in hours.
+                </p>
+            </div>
+            <div class="col-lg-4 text-center text-lg-end">
+                <a href="{{ url_for('main.apply') }}" class="btn btn-lg btn-light px-5">
+                    <i class="bi bi-arrow-right-circle me-2"></i>Start Your Application
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+    color: white;
+    padding: 100px 0 80px;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.hero-title {
+    position: relative;
+    z-index: 1;
+    line-height: 1.2;
+}
+
+.text-orange {
+    color: var(--secondary-orange);
+}
+
+.hero-subtitle {
+    position: relative;
+    z-index: 1;
+    font-size: 1.25rem;
+    opacity: 0.95;
+}
+
+.hero-cta {
+    position: relative;
+    z-index: 1;
+}
+
+.btn-outline-primary {
+    border: 2px solid white;
+    color: white;
+    background: transparent;
+}
+
+.btn-outline-primary:hover {
+    background: white;
+    color: var(--primary-blue);
+    border-color: white;
+}
+
+.hero-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+}
+
+.feature-item i {
+    font-size: 1.25rem;
+}
+
+.hero-image {
+    text-align: center;
+    font-size: 250px;
+    color: rgba(255, 255, 255, 0.1);
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+}
+
+/* Stats Section */
+.stats-section {
+    background: white;
+    padding: 80px 0;
+    margin-top: -40px;
+    position: relative;
+    z-index: 2;
+}
+
+.stat-box {
+    background: var(--light-gray);
+    padding: 2rem 1rem;
+    border-radius: 1rem;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.stat-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.stat-icon {
+    font-size: 3rem;
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--primary-blue);
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    color: var(--dark-gray);
+    font-weight: 500;
+    margin-bottom: 0;
+}
+
+/* How It Works Section */
+.how-it-works-section {
+    background: var(--light-gray);
+    padding: 80px 0;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: 1rem;
+}
+
+.section-subtitle {
+    font-size: 1.25rem;
+    color: var(--dark-gray);
+    opacity: 0.8;
+}
+
+.step-card {
+    background: white;
+    padding: 2.5rem 2rem;
+    border-radius: 1rem;
+    text-align: center;
+    height: 100%;
+    position: relative;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.step-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.step-number {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange));
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    box-shadow: 0 4px 15px rgba(234, 88, 12, 0.3);
+}
+
+.step-icon {
+    font-size: 4rem;
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 1rem 0;
+}
+
+.step-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: 1rem;
+}
+
+.step-description {
+    color: var(--dark-gray);
+    opacity: 0.8;
+    line-height: 1.6;
+}
+
+/* Benefits Section */
+.benefits-section {
+    background: white;
+    padding: 80px 0;
+}
+
+.benefit-card {
+    background: var(--light-gray);
+    padding: 2rem;
+    border-radius: 1rem;
+    display: flex;
+    gap: 1.5rem;
+    height: 100%;
+    transition: all 0.3s ease;
+}
+
+.benefit-card:hover {
+    transform: translateX(10px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.benefit-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    flex-shrink: 0;
+}
+
+.benefit-icon.bg-primary {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+}
+
+.benefit-icon.bg-orange {
+    background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange));
+}
+
+.benefit-content {
+    flex: 1;
+}
+
+.benefit-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: 0.75rem;
+}
+
+.benefit-description {
+    color: var(--dark-gray);
+    opacity: 0.8;
+    line-height: 1.6;
+    margin-bottom: 0;
+}
+
+/* CTA Section */
+.cta-section {
+    background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 50%, var(--primary-orange) 100%);
+    color: white;
+    padding: 60px 0;
+}
+
+.cta-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.cta-subtitle {
+    font-size: 1.25rem;
+    opacity: 0.95;
+}
+
+.btn-light {
+    background: white;
+    color: var(--primary-blue);
+    font-weight: 600;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-light:hover {
+    background: var(--light-gray);
+    color: var(--primary-orange);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero-section {
+        padding: 60px 0 40px;
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .stats-section {
+        padding: 60px 0;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+    }
+    
+    .section-title {
+        font-size: 2rem;
+    }
+    
+    .cta-title {
+        font-size: 2rem;
+    }
+    
+    .benefit-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .benefit-icon {
+        margin: 0 auto;
+    }
+}
+
+/* Technology Section */
+.technology-section {
+    background: white;
+    padding: 80px 0;
+}
+
+.tech-feature-large {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    color: white;
+    padding: 3rem;
+    border-radius: 1.5rem;
+    height: 100%;
+    animation: slideInLeft 0.8s ease-out;
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.tech-icon-large {
+    font-size: 5rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.9;
+}
+
+.tech-feature-large h3 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.tech-feature-large p {
+    opacity: 0.95;
+    line-height: 1.7;
+    font-size: 1.05rem;
+}
+
+.tech-feature-small {
+    background: var(--light-gray);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.3s ease;
+    animation: slideInRight 0.8s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.tech-feature-small:hover {
+    transform: translateX(10px);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+.tech-feature-small i {
+    font-size: 2.5rem;
+    background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.tech-feature-small h5 {
+    margin-bottom: 0.25rem;
+    color: var(--primary-blue);
+    font-weight: 700;
+}
+
+.tech-feature-small p {
+    margin-bottom: 0;
+    color: var(--dark-gray);
+    opacity: 0.8;
+    font-size: 0.9rem;
+}
+
+/* Trust Section */
+.trust-section {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue), var(--primary-blue));
+    padding: 80px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.trust-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(249, 115, 22, 0.2) 0%, transparent 70%);
+    animation: pulse 4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.trust-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 1rem;
+    text-align: center;
+    height: 100%;
+    transition: all 0.4s ease;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.trust-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+.trust-icon {
+    font-size: 4rem;
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1.5rem;
+}
+
+.trust-card h4 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: 1rem;
+}
+
+.trust-card p {
+    color: var(--dark-gray);
+    opacity: 0.8;
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+}
+
+.trust-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange));
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.trust-badge i {
+    margin-right: 0.25rem;
+}
+
+/* Testimonials Section */
+.testimonials-section {
+    background: var(--light-gray);
+    padding: 80px 0;
+}
+
+.testimonial-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    height: 100%;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    animation: fadeIn 1s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.testimonial-card:hover {
+    border-color: var(--secondary-orange);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.testimonial-rating {
+    color: var(--secondary-orange);
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.testimonial-text {
+    color: var(--dark-gray);
+    line-height: 1.7;
+    font-style: italic;
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.testimonial-text::before {
+    content: '"';
+    position: absolute;
+    left: 0;
+    top: -10px;
+    font-size: 3rem;
+    color: var(--light-blue);
+    opacity: 0.3;
+    font-family: Georgia, serif;
+}
+
+.testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding-top: 1rem;
+    border-top: 2px solid var(--light-gray);
+}
+
+.author-avatar {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+.testimonial-author strong {
+    display: block;
+    color: var(--primary-blue);
+    font-size: 1.1rem;
+}
+
+.testimonial-impact {
+    background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange));
+    color: white;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.testimonial-impact i {
+    margin-right: 0.5rem;
+}
+
+/* Industries Section */
+.industries-section {
+    background: white;
+    padding: 80px 0;
+}
+
+.industry-card {
+    background: var(--light-gray);
+    padding: 2rem 1rem;
+    border-radius: 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    height: 100%;
+}
+
+.industry-card:hover {
+    background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+    color: white;
+    transform: scale(1.05);
+    box-shadow: 0 10px 25px rgba(30, 64, 175, 0.3);
+}
+
+.industry-card i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: var(--primary-blue);
+    transition: color 0.3s ease;
+}
+
+.industry-card:hover i {
+    color: white;
+}
+
+.industry-card h5 {
+    font-weight: 700;
+    margin-bottom: 0;
+    color: var(--primary-blue);
+    transition: color 0.3s ease;
+}
+
+.industry-card:hover h5 {
+    color: white;
+}
+
+/* FAQ Section */
+.faq-section {
+    background: var(--light-gray);
+    padding: 80px 0;
+}
+
+.faq-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    border-left: 4px solid var(--primary-blue);
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.faq-card:hover {
+    border-left-color: var(--secondary-orange);
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    transform: translateX(5px);
+}
+
+.faq-question {
+    color: var(--primary-blue);
+    font-weight: 700;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.faq-question i {
+    font-size: 1.5rem;
+    color: var(--secondary-orange);
+}
+
+.faq-answer {
+    color: var(--dark-gray);
+    line-height: 1.7;
+    margin-bottom: 0;
+    opacity: 0.9;
+}
+
+/* Scroll Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.testimonial-card:nth-child(1) { animation-delay: 0.1s; }
+.testimonial-card:nth-child(2) { animation-delay: 0.2s; }
+.testimonial-card:nth-child(3) { animation-delay: 0.3s; }
+
+.industry-card {
+    animation: fadeIn 0.8s ease-out;
+}
+
+.industry-card:nth-child(1) { animation-delay: 0.1s; }
+.industry-card:nth-child(2) { animation-delay: 0.2s; }
+.industry-card:nth-child(3) { animation-delay: 0.3s; }
+.industry-card:nth-child(4) { animation-delay: 0.4s; }
+.industry-card:nth-child(5) { animation-delay: 0.5s; }
+.industry-card:nth-child(6) { animation-delay: 0.6s; }
+.industry-card:nth-child(7) { animation-delay: 0.7s; }
+.industry-card:nth-child(8) { animation-delay: 0.8s; }
+
+</style>
 {% endblock %}

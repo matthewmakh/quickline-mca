@@ -25,27 +25,154 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--light-gray);
+            padding-top: 76px; /* Space for fixed navbar */
+        }
+        
+        html {
+            scroll-behavior: smooth;
         }
         
         .navbar {
             background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
             box-shadow: 0 2px 8px rgba(30, 64, 175, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .navbar.scrolled {
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.98), rgba(59, 130, 246, 0.98));
+            backdrop-filter: blur(10px);
         }
         
         .navbar-brand {
             font-weight: 700;
             font-size: 1.5rem;
             color: white !important;
+            transition: transform 0.3s ease;
+        }
+        
+        .navbar-brand:hover {
+            transform: scale(1.05);
+        }
+        
+        .navbar-brand i {
+            animation: rotate 3s ease-in-out infinite;
+        }
+        
+        @keyframes rotate {
+            0%, 100% { transform: rotate(0deg); }
+            50% { transform: rotate(10deg); }
         }
         
         .nav-link {
             color: rgba(255,255,255,0.9) !important;
             font-weight: 500;
-            transition: color 0.3s ease;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0.5rem 1rem !important;
         }
         
         .nav-link:hover {
             color: var(--light-orange) !important;
+            transform: translateY(-2px);
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background: var(--secondary-orange);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::after {
+            width: 80%;
+        }
+        
+        .btn-apply-nav {
+            background: linear-gradient(135deg, var(--primary-orange), var(--secondary-orange)) !important;
+            color: white !important;
+            font-weight: 600;
+            padding: 0.6rem 1.5rem !important;
+            border-radius: 2rem !important;
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(234, 88, 12, 0.3);
+            animation: glow 2s ease-in-out infinite;
+        }
+        
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 4px 15px rgba(234, 88, 12, 0.3); }
+            50% { box-shadow: 0 4px 25px rgba(234, 88, 12, 0.6); }
+        }
+        
+        .btn-apply-nav:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 6px 25px rgba(234, 88, 12, 0.5);
+        }
+        
+        .btn-login-nav {
+            background: rgba(255, 255, 255, 0.2) !important;
+            color: white !important;
+            font-weight: 600;
+            padding: 0.6rem 1.5rem !important;
+            border-radius: 2rem !important;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn-login-nav:hover {
+            background: white !important;
+            color: var(--primary-blue) !important;
+            border-color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3);
+        }
+        
+        .login-dropdown {
+            background: white;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border-radius: 1rem;
+            padding: 0.5rem 0;
+            margin-top: 0.5rem;
+            min-width: 200px;
+        }
+        
+        .login-dropdown .dropdown-item {
+            padding: 0.75rem 1.5rem;
+            color: var(--dark-gray);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .login-dropdown .dropdown-item i {
+            font-size: 1.25rem;
+            color: var(--primary-blue);
+            transition: all 0.3s ease;
+        }
+        
+        .login-dropdown .dropdown-item:hover {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+            padding-left: 2rem;
+        }
+        
+        .login-dropdown .dropdown-item:hover i {
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .login-dropdown .dropdown-divider {
+            margin: 0.5rem 1rem;
+            border-color: var(--light-gray);
         }
         
         .btn-primary {
@@ -132,45 +259,84 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('main.index') }}">
-                <i class="bi bi-cash-stack"></i> QuickLine LLC
+                <i class="bi bi-lightning-charge-fill"></i> QuickLine LLC
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto align-items-center">
                     {% if current_user.is_authenticated %}
                         {% if current_user.role == 'admin' %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('admin.dashboard') }}">Admin Dashboard</a>
+                                <a class="nav-link" href="{{ url_for('admin.dashboard') }}">
+                                    <i class="bi bi-speedometer2"></i> Admin Dashboard
+                                </a>
                             </li>
                         {% elif current_user.role == 'rep' %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('rep.dashboard') }}">Rep Dashboard</a>
+                                <a class="nav-link" href="{{ url_for('rep.dashboard') }}">
+                                    <i class="bi bi-briefcase"></i> Rep Dashboard
+                                </a>
                             </li>
                         {% endif %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout ({{ current_user.username }})</a>
+                            <a class="nav-link" href="{{ url_for('auth.logout') }}">
+                                <i class="bi bi-box-arrow-right"></i> Logout ({{ current_user.username }})
+                            </a>
                         </li>
                     {% elif session.get('customer_id') %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('customer.dashboard') }}">My Account</a>
+                            <a class="nav-link" href="{{ url_for('customer.dashboard') }}">
+                                <i class="bi bi-person-circle"></i> My Account
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
+                            <a class="nav-link" href="{{ url_for('auth.logout') }}">
+                                <i class="bi bi-box-arrow-right"></i> Logout
+                            </a>
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('main.apply') }}">Apply Now</a>
+                            <a class="nav-link scroll-link" href="#home">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.customer_login') }}">Customer Login</a>
+                            <a class="nav-link scroll-link" href="#how-it-works">How It Works</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('auth.login') }}">Staff Login</a>
+                            <a class="nav-link scroll-link" href="#benefits">Why Choose Us</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link scroll-link" href="#testimonials">Success Stories</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link scroll-link" href="#faq">FAQ</a>
+                        </li>
+                        <li class="nav-item ms-2">
+                            <a class="nav-link btn-apply-nav" href="{{ url_for('main.apply') }}">
+                                <i class="bi bi-rocket-takeoff-fill"></i> Apply Now
+                            </a>
+                        </li>
+                        <li class="nav-item dropdown ms-2">
+                            <a class="nav-link btn-login-nav dropdown-toggle" href="#" id="loginDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-fill"></i> Login
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end login-dropdown" aria-labelledby="loginDropdown">
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('auth.customer_login') }}">
+                                        <i class="bi bi-person-circle"></i> Customer Login
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('auth.login') }}">
+                                        <i class="bi bi-shield-lock"></i> Staff Login
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                     {% endif %}
                 </ul>
@@ -178,21 +344,21 @@
         </div>
     </nav>
 
-    <main class="py-4">
-        <div class="container">
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="container mt-4">
                     {% for category, message in messages %}
                         <div class="alert alert-{{ 'danger' if category == 'error' else category }} alert-dismissible fade show" role="alert">
                             {{ message }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                         </div>
                     {% endfor %}
-                {% endif %}
-            {% endwith %}
+                </div>
+            {% endif %}
+        {% endwith %}
 
-            {% block content %}{% endblock %}
-        </div>
+        {% block content %}{% endblock %}
     </main>
 
     <footer>
@@ -203,6 +369,36 @@
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('.scroll-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetSection = document.querySelector(targetId);
+                
+                if (targetSection) {
+                    const navbarHeight = document.querySelector('#mainNav').offsetHeight;
+                    const targetPosition = targetSection.offsetTop - navbarHeight;
+                    
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('#mainNav');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>
