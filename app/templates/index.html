@@ -39,8 +39,8 @@
                 </div>
             </div>
             <div class="col-lg-6 d-none d-lg-block">
-                <div class="hero-image">
-                    <i class="bi bi-graph-up-arrow"></i>
+                <div class="hero-image-container">
+                    <img src="{{ url_for('static', filename='images/hero-business-collage.png') }}" alt="Business Success Stories" class="hero-business-image">
                 </div>
             </div>
         </div>
@@ -628,11 +628,25 @@
     font-size: 1.25rem;
 }
 
-.hero-image {
-    text-align: center;
-    font-size: 250px;
-    color: rgba(255, 255, 255, 0.1);
+.hero-image-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     animation: float 3s ease-in-out infinite;
+}
+
+.hero-business-image {
+    width: 100%;
+    max-width: 600px;
+    height: auto;
+    border-radius: 2rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease;
+}
+
+.hero-business-image:hover {
+    transform: scale(1.02);
 }
 
 @keyframes float {
