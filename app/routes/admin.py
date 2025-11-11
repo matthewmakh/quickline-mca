@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, session
 from flask_login import login_required, current_user
 from app.models import Application, User, Customer, LineOfCredit, ActivityLog, WithdrawalRequest
-from app.forms import CreateUserForm, LineOfCreditForm, AssignRepForm, CustomerPasswordForm, ChangeCustomerPasswordForm
+from app.forms import CreateUserForm, LineOfCreditForm, AssignRepForm, CustomerPasswordForm, ChangeCustomerPasswordForm, UpdateDealStatusForm, ApplicationForm, RecordPaymentForm
 from app import db
 from datetime import datetime
 from functools import wraps
@@ -76,7 +76,20 @@ def applications():
 def view_application(id):
     """View detailed application"""
     application = Application.query.get_or_404(id)
-    return render_template('admin/view_application.html', application=application)
+    
+    # Check for duplicate applications from same email
+    duplicate_applications = Application.query.filter(
+        Application.owner_email == application.owner_email,
+        Application.id != application.id
+    ).all()
+    
+    # Check if customer already exists with this email
+    existing_customer = Customer.query.filter_by(email=application.owner_email).first()
+    
+    return render_template('admin/view_application.html', 
+                         application=application,
+                         duplicate_applications=duplicate_applications,
+                         existing_customer=existing_customer)
 
 
 @bp.route('/application/<int:id>/approve', methods=['POST'])
@@ -90,6 +103,19 @@ def approve_application(id):
         flash('This application is already approved.', 'warning')
         return redirect(url_for('admin.view_application', id=id))
     
+    # Check if customer with this email already exists
+    existing_customer = Customer.query.filter_by(email=application.owner_email).first()
+    
+    if existing_customer:
+        # Customer already exists - mark application as approved and create another LOC
+        application.status = 'approved'
+        application.reviewed_at = datetime.utcnow()
+        db.session.commit()
+        
+        flash(f'Application approved! Customer account already exists for {application.owner_email}. '
+              f'You can now create an additional line of credit for this customer.', 'info')
+        return redirect(url_for('admin.create_line_of_credit', customer_id=existing_customer.id))
+    
     # Update application status
     application.status = 'approved'
     application.reviewed_at = datetime.utcnow()
@@ -98,7 +124,7 @@ def approve_application(id):
     alphabet = string.ascii_letters + string.digits
     generated_password = ''.join(secrets.choice(alphabet) for i in range(12))
     
-    # Create customer account
+    # Create new customer account
     customer = Customer(
         application_id=application.id,
         email=application.owner_email,
@@ -146,6 +172,118 @@ def reject_application(id):
     return redirect(url_for('admin.applications'))
 
 
+@bp.route('/application/<int:id>/edit', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def edit_application(id):
+    """Edit an existing application"""
+    application = Application.query.get_or_404(id)
+    form = ApplicationForm(obj=application)
+    
+    if form.validate_on_submit():
+        # Update all application fields
+        application.business_name = form.business_name.data
+        application.business_legal_name = form.business_legal_name.data
+        application.ein = form.ein.data
+        application.business_type = form.business_type.data
+        application.industry = form.industry.data
+        application.years_in_business = form.years_in_business.data
+        application.business_address = form.business_address.data
+        application.business_city = form.business_city.data
+        application.business_state = form.business_state.data
+        application.business_zip = form.business_zip.data
+        application.business_phone = form.business_phone.data
+        
+        application.monthly_revenue = form.monthly_revenue.data
+        application.annual_revenue = form.annual_revenue.data
+        application.average_monthly_bank_balance = form.average_monthly_bank_balance.data
+        application.existing_debt = form.existing_debt.data
+        application.credit_score = form.credit_score.data
+        application.requested_amount = form.requested_amount.data
+        application.purpose_of_funding = form.purpose_of_funding.data
+        
+        application.owner_first_name = form.owner_first_name.data
+        application.owner_last_name = form.owner_last_name.data
+        application.owner_email = form.owner_email.data
+        application.owner_phone = form.owner_phone.data
+        application.owner_ssn_last_4 = form.owner_ssn_last_4.data
+        application.owner_date_of_birth = form.owner_date_of_birth.data
+        application.owner_address = form.owner_address.data
+        application.owner_city = form.owner_city.data
+        application.owner_state = form.owner_state.data
+        application.owner_zip = form.owner_zip.data
+        application.ownership_percentage = form.ownership_percentage.data
+        
+        application.bank_name = form.bank_name.data
+        application.bank_account_type = form.bank_account_type.data
+        application.time_with_bank = form.time_with_bank.data
+        application.average_daily_balance = form.average_daily_balance.data
+        application.number_of_nsf_last_3_months = form.number_of_nsf_last_3_months.data
+        
+        application.has_merchant_account = form.has_merchant_account.data
+        application.monthly_card_sales = form.monthly_card_sales.data
+        application.uses_online_sales = form.uses_online_sales.data
+        application.online_sales_percentage = form.online_sales_percentage.data
+        application.has_previous_mca = form.has_previous_mca.data
+        application.previous_mca_details = form.previous_mca_details.data
+        
+        db.session.commit()
+        
+        # Log activity
+        log_activity(
+            action_type='edit_application',
+            description=f'Edited application for {application.business_name}',
+            user_id=current_user.id,
+            application_id=application.id
+        )
+        
+        flash(f'Application for {application.business_name} updated successfully.', 'success')
+        return redirect(url_for('admin.view_application', id=application.id))
+    
+    return render_template('admin/edit_application.html', form=form, application=application)
+
+
+@bp.route('/application/<int:id>/delete', methods=['POST'])
+@login_required
+@admin_required
+def delete_application(id):
+    """Delete an application"""
+    application = Application.query.get_or_404(id)
+    business_name = application.business_name
+    app_id = application.id
+    
+    # Check if application is linked to a customer
+    customer = Customer.query.filter_by(application_id=application.id).first()
+    
+    if customer:
+        flash(f'Cannot delete application: It is linked to customer account "{customer.business_name}". '
+              f'Delete the customer account first if needed.', 'error')
+        return redirect(url_for('admin.view_application', id=id))
+    
+    try:
+        # Delete related activity logs first
+        ActivityLog.query.filter_by(application_id=application.id).delete()
+        db.session.flush()
+        
+        # Delete the application
+        db.session.delete(application)
+        db.session.commit()
+        
+        # Log the deletion after successful commit (with no application_id since we deleted it)
+        log_activity(
+            action_type='delete_application',
+            description=f'Deleted application #{app_id} for {business_name}',
+            user_id=current_user.id
+        )
+        
+        flash(f'Application for {business_name} has been deleted.', 'info')
+        return redirect(url_for('admin.applications'))
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting application: {str(e)}', 'error')
+        return redirect(url_for('admin.applications'))
+
+
 @bp.route('/deals')
 @login_required
 @admin_required
@@ -167,7 +305,139 @@ def deals():
 def view_deal(id):
     """View deal details"""
     loc = LineOfCredit.query.get_or_404(id)
-    return render_template('admin/view_deal.html', loc=loc)
+    
+    # Get payment history from activity logs
+    payment_logs = ActivityLog.query.filter_by(
+        line_of_credit_id=loc.id,
+        action_type='payment_recorded'
+    ).order_by(ActivityLog.created_at.desc()).all()
+    
+    # Calculate metrics
+    from datetime import date, timedelta
+    
+    # Days since last payment
+    days_since_payment = None
+    if loc.last_payment_date:
+        days_since_payment = (date.today() - loc.last_payment_date).days
+    
+    # Calculate expected number of payments
+    expected_payments = 0
+    if loc.first_payment_date and loc.payment_frequency:
+        days_since_start = (date.today() - loc.first_payment_date).days
+        if days_since_start >= 0:  # Only calculate if first payment date has passed
+            if loc.payment_frequency == 'Daily':
+                expected_payments = max(0, days_since_start)
+            elif loc.payment_frequency == 'Weekly':
+                expected_payments = max(0, days_since_start // 7)
+            elif loc.payment_frequency == 'Monthly':
+                expected_payments = max(0, days_since_start // 30)
+    
+    # Payment compliance - calculate how ahead or behind customer is
+    payment_ahead_behind = loc.number_of_payments_made - expected_payments
+    
+    # Calculate total expected from used amount
+    total_expected = loc.used_amount
+    if loc.factor_rate:
+        total_expected = loc.used_amount * loc.factor_rate
+    elif loc.interest_rate and loc.term_months:
+        # Simple interest calculation
+        total_expected = loc.used_amount * (1 + (loc.interest_rate / 100) * (loc.term_months / 12))
+    
+    # Remaining balance percentage
+    balance_percentage = (loc.outstanding_balance / total_expected * 100) if total_expected > 0 else 0
+    
+    return render_template('admin/view_deal.html', 
+                         loc=loc, 
+                         payment_logs=payment_logs,
+                         days_since_payment=days_since_payment,
+                         expected_payments=expected_payments,
+                         payment_ahead_behind=payment_ahead_behind,
+                         total_expected=total_expected,
+                         balance_percentage=balance_percentage)
+
+
+@bp.route('/deal/<int:id>/record-payment', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def record_payment(id):
+    """Record a payment made by customer"""
+    loc = LineOfCredit.query.get_or_404(id)
+    form = RecordPaymentForm()
+    
+    if form.validate_on_submit():
+        payment_amount = form.payment_amount.data
+        payment_date = form.payment_date.data
+        payment_method = form.payment_method.data
+        notes = form.notes.data or ''
+        
+        # Ensure outstanding_balance is set
+        if loc.outstanding_balance is None:
+            loc.outstanding_balance = 0.0
+        
+        # Validate payment amount doesn't exceed outstanding balance
+        if loc.outstanding_balance > 0 and payment_amount > loc.outstanding_balance:
+            flash(f'Payment amount ${payment_amount:,.2f} exceeds outstanding balance ${loc.outstanding_balance:,.2f}', 'error')
+            return render_template('admin/record_payment.html', form=form, loc=loc)
+        
+        # Update line of credit financials
+        loc.total_paid += payment_amount
+        loc.outstanding_balance -= payment_amount
+        loc.number_of_payments_made += 1
+        loc.last_payment_date = payment_date
+        loc.updated_at = datetime.utcnow()
+        
+        # Check if fully paid off
+        if loc.outstanding_balance <= 0:
+            loc.outstanding_balance = 0
+            loc.status = 'paid_off'
+            flash(f'🎉 Line of credit fully paid off!', 'success')
+        
+        db.session.commit()
+        
+        # Log activity with detailed payment info
+        log_activity(
+            action_type='payment_recorded',
+            description=f'Payment of ${payment_amount:,.2f} recorded via {payment_method} on {payment_date.strftime("%m/%d/%Y")} by {current_user.username}. {notes}',
+            user_id=current_user.id,
+            customer_id=loc.customer_id,
+            line_of_credit_id=loc.id,
+            metadata={"amount": payment_amount, "method": payment_method, "date": payment_date.isoformat()}
+        )
+        
+        flash(f'Payment of ${payment_amount:,.2f} recorded successfully!', 'success')
+        return redirect(url_for('admin.view_deal', id=loc.id))
+    
+    return render_template('admin/record_payment.html', form=form, loc=loc)
+
+
+@bp.route('/deal/<int:id>/mark-paid-off', methods=['POST'])
+@login_required
+@admin_required
+def mark_paid_off(id):
+    """Mark a deal as paid off"""
+    loc = LineOfCredit.query.get_or_404(id)
+    
+    if loc.status == 'paid_off':
+        flash('This deal is already marked as paid off.', 'info')
+        return redirect(url_for('admin.view_deal', id=loc.id))
+    
+    loc.status = 'paid_off'
+    loc.outstanding_balance = 0
+    loc.updated_at = datetime.utcnow()
+    
+    db.session.commit()
+    
+    # Log activity
+    log_activity(
+        action_type='deal_paid_off',
+        description=f'Deal #{loc.id} marked as paid off by {current_user.username}',
+        user_id=current_user.id,
+        customer_id=loc.customer_id,
+        line_of_credit_id=loc.id
+    )
+    
+    flash(f'🎉 Deal marked as paid off!', 'success')
+    return redirect(url_for('admin.view_deal', id=loc.id))
 
 
 @bp.route('/customer/<int:customer_id>/create-line-of-credit', methods=['GET', 'POST'])
@@ -177,10 +447,7 @@ def create_line_of_credit(customer_id):
     """Create line of credit for approved customer"""
     customer = Customer.query.get_or_404(customer_id)
     
-    if customer.line_of_credit:
-        flash('This customer already has a line of credit.', 'warning')
-        return redirect(url_for('admin.edit_line_of_credit', id=customer.line_of_credit.id))
-    
+    # Customer can now have multiple LOCs, so no need to check for existing
     form = LineOfCreditForm()
     
     if form.validate_on_submit():
@@ -278,15 +545,63 @@ def assign_rep(id):
 @login_required
 @admin_required
 def delete_deal(id):
-    """Delete a line of credit"""
+    """Delete a line of credit and associated customer"""
     loc = LineOfCredit.query.get_or_404(id)
-    customer_name = loc.customer.business_name
+    customer = loc.customer
+    customer_name = customer.business_name
+    customer_id = customer.id
     
+    # Log the action before deletion
+    log_activity(
+        action_type='delete_deal',
+        description=f'Deleted line of credit for {customer_name}',
+        user_id=current_user.id,
+        line_of_credit_id=loc.id
+    )
+    
+    # First delete the line of credit
     db.session.delete(loc)
+    db.session.flush()  # Flush to database but don't commit yet
+    
+    # Then delete activity logs related to this customer
+    ActivityLog.query.filter_by(customer_id=customer_id).delete()
+    
+    # Finally delete the customer
+    db.session.delete(customer)
     db.session.commit()
     
-    flash(f'Line of credit for {customer_name} has been deleted.', 'info')
+    flash(f'Line of credit and customer account for {customer_name} have been deleted.', 'info')
     return redirect(url_for('admin.deals'))
+
+
+@bp.route('/deal/<int:id>/update-status', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def update_deal_status(id):
+    """Update the status of a line of credit"""
+    loc = LineOfCredit.query.get_or_404(id)
+    form = UpdateDealStatusForm()
+    
+    if form.validate_on_submit():
+        old_status = loc.status
+        loc.status = form.status.data
+        
+        # Log the status change
+        log_activity(
+            action_type='update_deal_status',
+            description=f'Changed status from {old_status} to {loc.status}. Notes: {form.notes.data or "None"}',
+            user_id=current_user.id,
+            line_of_credit_id=loc.id
+        )
+        
+        db.session.commit()
+        flash(f'Deal status updated to {loc.status}.', 'success')
+        return redirect(url_for('admin.view_deal', id=loc.id))
+    
+    # Pre-populate with current status
+    form.status.data = loc.status
+    
+    return render_template('admin/update_deal_status.html', form=form, loc=loc)
 
 
 @bp.route('/users')
@@ -388,11 +703,36 @@ def delete_customer(id):
     customer = Customer.query.get_or_404(id)
     business_name = customer.business_name
     
-    db.session.delete(customer)
-    db.session.commit()
-    
-    flash(f'Customer {business_name} has been deleted.', 'info')
-    return redirect(url_for('admin.customers'))
+    try:
+        # Get the line of credit for this customer (if exists)
+        loc = customer.line_of_credit
+        
+        # Delete in correct order to avoid foreign key constraints
+        # 1. Delete withdrawal requests
+        if loc:
+            WithdrawalRequest.query.filter_by(line_of_credit_id=loc.id).delete()
+        WithdrawalRequest.query.filter_by(customer_id=customer.id).delete()
+        
+        # 2. Delete activity logs
+        ActivityLog.query.filter_by(customer_id=customer.id).delete()
+        if loc:
+            ActivityLog.query.filter_by(line_of_credit_id=loc.id).delete()
+        
+        # 3. Delete the line of credit itself (must be before customer)
+        if loc:
+            db.session.delete(loc)
+        
+        # 4. Finally delete the customer
+        db.session.delete(customer)
+        db.session.commit()
+        
+        flash(f'Customer {business_name} and all related data have been deleted.', 'info')
+        return redirect(url_for('admin.customers'))
+        
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting customer: {str(e)}', 'error')
+        return redirect(url_for('admin.customers'))
 
 
 @bp.route('/customers/<int:id>/password', methods=['GET', 'POST'])
@@ -531,3 +871,80 @@ def deny_withdrawal(id):
     
     flash(f'Withdrawal request denied.', 'info')
     return redirect(url_for('admin.withdrawal_requests'))
+
+
+@bp.route('/reports')
+@login_required
+@admin_required
+def reports():
+    """Financial summary reports"""
+    from datetime import date, timedelta
+    from sqlalchemy import func
+    
+    # Get all active lines of credit
+    active_locs = LineOfCredit.query.filter_by(status='active').all()
+    
+    # Calculate totals
+    total_outstanding = sum(loc.outstanding_balance for loc in active_locs)
+    total_credit_issued = sum(loc.approved_amount for loc in active_locs)
+    total_credit_used = sum(loc.used_amount for loc in active_locs)
+    total_collected = db.session.query(func.sum(LineOfCredit.total_paid)).scalar() or 0
+    
+    # Calculate averages
+    all_locs = LineOfCredit.query.all()
+    avg_deal_size = (sum(loc.approved_amount for loc in all_locs) / len(all_locs)) if all_locs else 0
+    
+    # Get payment activity
+    payment_logs = ActivityLog.query.filter_by(action_type='payment_recorded').all()
+    payment_amounts = [float(log.extra_data.split('"amount": ')[1].split(',')[0]) 
+                      for log in payment_logs if '"amount":' in log.extra_data]
+    avg_payment = (sum(payment_amounts) / len(payment_amounts)) if payment_amounts else 0
+    
+    # This month's collections
+    first_day_of_month = date.today().replace(day=1)
+    monthly_payments = ActivityLog.query.filter(
+        ActivityLog.action_type == 'payment_recorded',
+        ActivityLog.created_at >= first_day_of_month
+    ).all()
+    this_month_collected = sum(float(log.extra_data.split('"amount": ')[1].split(',')[0]) 
+                               for log in monthly_payments if '"amount":' in log.extra_data)
+    
+    # This year's collections
+    first_day_of_year = date.today().replace(month=1, day=1)
+    yearly_payments = ActivityLog.query.filter(
+        ActivityLog.action_type == 'payment_recorded',
+        ActivityLog.created_at >= first_day_of_year
+    ).all()
+    this_year_collected = sum(float(log.extra_data.split('"amount": ')[1].split(',')[0]) 
+                              for log in yearly_payments if '"amount":' in log.extra_data)
+    
+    # Deal status breakdown
+    status_counts = {
+        'active': LineOfCredit.query.filter_by(status='active').count(),
+        'paid_off': LineOfCredit.query.filter_by(status='paid_off').count(),
+        'defaulted': LineOfCredit.query.filter_by(status='defaulted').count(),
+        'suspended': LineOfCredit.query.filter_by(status='suspended').count()
+    }
+    
+    # Top customers by outstanding balance
+    top_customers = sorted(active_locs, key=lambda x: x.outstanding_balance, reverse=True)[:10]
+    
+    # Recent payments
+    recent_payments = ActivityLog.query.filter_by(
+        action_type='payment_recorded'
+    ).order_by(ActivityLog.created_at.desc()).limit(20).all()
+    
+    return render_template('admin/reports.html',
+                         total_outstanding=total_outstanding,
+                         total_credit_issued=total_credit_issued,
+                         total_credit_used=total_credit_used,
+                         total_collected=total_collected,
+                         avg_deal_size=avg_deal_size,
+                         avg_payment=avg_payment,
+                         this_month_collected=this_month_collected,
+                         this_year_collected=this_year_collected,
+                         status_counts=status_counts,
+                         top_customers=top_customers,
+                         recent_payments=recent_payments,
+                         active_deals_count=len(active_locs),
+                         total_deals_count=len(all_locs))

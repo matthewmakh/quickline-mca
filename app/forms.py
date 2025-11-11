@@ -130,3 +130,26 @@ class WithdrawalRequestForm(FlaskForm):
     requested_amount = FloatField('Withdrawal Amount', validators=[DataRequired(), NumberRange(min=0.01)])
     purpose = TextAreaField('Purpose of Withdrawal', validators=[DataRequired()])
     submit = SubmitField('Submit Request')
+
+
+class RecordPaymentForm(FlaskForm):
+    """Form for admin to record a payment made by customer"""
+    payment_amount = FloatField('Payment Amount', validators=[DataRequired(), NumberRange(min=0.01)])
+    payment_date = DateField('Payment Date', validators=[DataRequired()])
+    payment_method = SelectField('Payment Method',
+                                choices=[('ACH', 'ACH'), ('Wire', 'Wire Transfer'), 
+                                        ('Check', 'Check'), ('Card', 'Credit/Debit Card'),
+                                        ('Other', 'Other')],
+                                validators=[DataRequired()])
+    notes = TextAreaField('Notes (optional)', validators=[Optional()])
+    submit = SubmitField('Record Payment')
+
+
+class UpdateDealStatusForm(FlaskForm):
+    """Form for admin to update deal status"""
+    status = SelectField('Status',
+                        choices=[('active', 'Active'), ('paid_off', 'Paid Off'),
+                                ('defaulted', 'Defaulted'), ('suspended', 'Suspended')],
+                        validators=[DataRequired()])
+    notes = TextAreaField('Notes (optional)', validators=[Optional()])
+    submit = SubmitField('Update Status')

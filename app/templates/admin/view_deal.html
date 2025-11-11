@@ -10,6 +10,105 @@
     </a>
 </div>
 
+<!-- Quick Actions Row -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-lightning-fill"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="{{ url_for('admin.record_payment', id=loc.id) }}" class="btn btn-success">
+                        <i class="bi bi-credit-card"></i> Record Payment
+                    </a>
+                    <button class="btn btn-info" onclick="alert('Payment reminder sent! (Feature coming soon)')">
+                        <i class="bi bi-bell"></i> Send Payment Reminder
+                    </button>
+                    <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#adjustBalanceModal">
+                        <i class="bi bi-calculator"></i> Adjust Balance
+                    </button>
+                    {% if loc.status != 'paid_off' and loc.outstanding_balance == 0 %}
+                    <form method="POST" action="{{ url_for('admin.mark_paid_off', id=loc.id) }}" style="display: inline;">
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-check-circle"></i> Mark as Paid Off
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Financial Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="text-muted">Outstanding Balance</h6>
+                <h2 class="text-danger mb-0">${{ "{:,.2f}".format(loc.outstanding_balance) }}</h2>
+                <small class="text-muted">{{ "%.1f"|format(balance_percentage) }}% remaining</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="text-muted">Total Paid</h6>
+                <h2 class="text-success mb-0">${{ "{:,.2f}".format(loc.total_paid) }}</h2>
+                <small class="text-muted">{{ loc.number_of_payments_made }} payments</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="text-muted">Days Since Payment</h6>
+                <h2 class="mb-0">
+                    {% if days_since_payment is not none %}
+                        {% if days_since_payment > 30 %}
+                            <span class="text-danger">{{ days_since_payment }}</span>
+                        {% elif days_since_payment > 14 %}
+                            <span class="text-warning">{{ days_since_payment }}</span>
+                        {% else %}
+                            <span class="text-success">{{ days_since_payment }}</span>
+                        {% endif %}
+                    {% else %}
+                        <span class="text-muted">N/A</span>
+                    {% endif %}
+                </h2>
+                <small class="text-muted">
+                    {% if loc.last_payment_date %}
+                        Last: {{ loc.last_payment_date.strftime('%m/%d/%Y') }}
+                    {% else %}
+                        No payments yet
+                    {% endif %}
+                </small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h6 class="text-muted">Payment Status</h6>
+                <h2 class="mb-0">
+                    {% if payment_ahead_behind > 0 %}
+                        <span class="text-success">+{{ payment_ahead_behind }}</span>
+                    {% elif payment_ahead_behind < 0 %}
+                        <span class="text-danger">{{ payment_ahead_behind }}</span>
+                    {% else %}
+                        <span class="text-info">On Track</span>
+                    {% endif %}
+                </h2>
+                <small class="text-muted">
+                    {{ loc.number_of_payments_made }} of {{ expected_payments }} expected
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row">
     <div class="col-md-8">
         <div class="card mb-4">
@@ -110,6 +209,41 @@
                 {% endif %}
             </div>
         </div>
+
+        <!-- Payment History -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Payment History</h5>
+            </div>
+            <div class="card-body">
+                {% if payment_logs %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Details</th>
+                                    <th>Recorded By</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in payment_logs %}
+                                <tr>
+                                    <td>{{ log.created_at.strftime('%m/%d/%Y %I:%M %p') }}</td>
+                                    <td><strong class="text-success">${{ log.extra_data.split('"amount": ')[1].split(',')[0] if '"amount":' in log.extra_data else 'N/A' }}</strong></td>
+                                    <td>{{ log.description }}</td>
+                                    <td>{{ log.user.username if log.user else 'System' }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">No payments recorded yet.</p>
+                {% endif %}
+            </div>
+        </div>
     </div>
 
     <div class="col-md-4">
@@ -153,8 +287,8 @@
         </div>
 
         <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Actions</h5>
+            <div class="card-header">
+                <h5 class="mb-0">Management</h5>
             </div>
             <div class="card-body">
                 <a href="{{ url_for('admin.edit_line_of_credit', id=loc.id) }}" class="btn btn-warning w-100 mb-2">
@@ -170,6 +304,25 @@
                         <i class="bi bi-trash"></i> Delete Deal
                     </button>
                 </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Adjust Balance Modal -->
+<div class="modal fade" id="adjustBalanceModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Adjust Balance</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>This feature allows you to manually adjust the outstanding balance for corrections or credits.</p>
+                <p class="text-muted"><small>Coming soon: This will log the adjustment in the activity feed.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, session
-from app.models import Customer, LineOfCredit, WithdrawalRequest
+from app.models import Customer, LineOfCredit, WithdrawalRequest, ActivityLog
 from app.forms import WithdrawalRequestForm
 from app import db
 from app.utils import log_activity
@@ -38,10 +38,17 @@ def dashboard():
     # Calculate utilization percentage
     utilization_percentage = (loc.used_amount / loc.approved_amount * 100) if loc.approved_amount > 0 else 0
     
+    # Get payment history
+    payment_logs = ActivityLog.query.filter_by(
+        line_of_credit_id=loc.id,
+        action_type='payment_recorded'
+    ).order_by(ActivityLog.created_at.desc()).limit(10).all()
+    
     return render_template('customer/dashboard.html',
                          customer=customer,
                          loc=loc,
-                         utilization_percentage=utilization_percentage)
+                         utilization_percentage=utilization_percentage,
+                         payment_logs=payment_logs)
 
 
 @bp.route('/details')

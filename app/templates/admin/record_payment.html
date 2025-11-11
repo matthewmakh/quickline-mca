@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Record Payment - Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-credit-card"></i> Record Payment</h1>
+    <a href="{{ url_for('admin.view_deal', id=loc.id) }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Deal
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0">Deal Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>Customer:</strong><br>
+                        {{ loc.customer.business_name }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Deal #{{ loc.id }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">Current Balance</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <strong>Outstanding Balance:</strong><br>
+                        <span class="fs-4 text-danger">${{ "{:,.2f}".format(loc.outstanding_balance) }}</span>
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Total Paid:</strong><br>
+                        <span class="fs-4 text-success">${{ "{:,.2f}".format(loc.total_paid) }}</span>
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Payments Made:</strong><br>
+                        <span class="fs-4">{{ loc.number_of_payments_made }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Record New Payment</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.record_payment', id=loc.id) }}">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="payment_amount" class="form-label">{{ form.payment_amount.label }}</label>
+                            {{ form.payment_amount(class="form-control", placeholder="0.00") }}
+                            {% if form.payment_amount.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.payment_amount.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="payment_date" class="form-label">{{ form.payment_date.label }}</label>
+                            {{ form.payment_date(class="form-control") }}
+                            {% if form.payment_date.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.payment_date.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="payment_method" class="form-label">{{ form.payment_method.label }}</label>
+                        {{ form.payment_method(class="form-select") }}
+                        {% if form.payment_method.errors %}
+                            <div class="text-danger">
+                                {% for error in form.payment_method.errors %}
+                                    <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">{{ form.notes.label }}</label>
+                        {{ form.notes(class="form-control", rows=3, placeholder="Add any additional notes about this payment...") }}
+                        {% if form.notes.errors %}
+                            <div class="text-danger">
+                                {% for error in form.notes.errors %}
+                                    <small>{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        {{ form.submit(class="btn btn-success btn-lg") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card bg-light">
+            <div class="card-header">
+                <h6 class="mb-0"><i class="bi bi-info-circle"></i> Quick Info</h6>
+            </div>
+            <div class="card-body">
+                <p><strong>Payment Frequency:</strong><br>{{ loc.payment_frequency }}</p>
+                <p><strong>Expected Payment:</strong><br>${{ "{:,.2f}".format(loc.payment_amount) }}</p>
+                {% if loc.last_payment_date %}
+                <p><strong>Last Payment:</strong><br>{{ loc.last_payment_date.strftime('%m/%d/%Y') }}</p>
+                {% else %}
+                <p><strong>Last Payment:</strong><br>No payments yet</p>
+                {% endif %}
+                {% if loc.next_payment_date %}
+                <p><strong>Next Payment Due:</strong><br>{{ loc.next_payment_date.strftime('%m/%d/%Y') }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

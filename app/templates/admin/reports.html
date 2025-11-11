@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+
+{% block title %}Financial Reports - Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1><i class="bi bi-bar-chart-line"></i> Financial Reports</h1>
+    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Dashboard
+    </a>
+</div>
+
+<!-- Key Metrics Row -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card text-center border-danger">
+            <div class="card-body">
+                <h6 class="text-muted">Total Outstanding</h6>
+                <h2 class="text-danger mb-0">${{ "{:,.2f}".format(total_outstanding) }}</h2>
+                <small class="text-muted">Across {{ active_deals_count }} active deals</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center border-success">
+            <div class="card-body">
+                <h6 class="text-muted">Total Collected</h6>
+                <h2 class="text-success mb-0">${{ "{:,.2f}".format(total_collected) }}</h2>
+                <small class="text-muted">All time</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center border-primary">
+            <div class="card-body">
+                <h6 class="text-muted">Total Credit Issued</h6>
+                <h2 class="text-primary mb-0">${{ "{:,.2f}".format(total_credit_issued) }}</h2>
+                <small class="text-muted">Active lines</small>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-center border-warning">
+            <div class="card-body">
+                <h6 class="text-muted">Credit Utilized</h6>
+                <h2 class="text-warning mb-0">${{ "{:,.2f}".format(total_credit_used) }}</h2>
+                <small class="text-muted">{{ "%.1f"|format((total_credit_used / total_credit_issued * 100) if total_credit_issued > 0 else 0) }}% of issued</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Collections Row -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-calendar-month"></i> Collections This Month</h5>
+            </div>
+            <div class="card-body text-center">
+                <h1 class="text-success">${{ "{:,.2f}".format(this_month_collected) }}</h1>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-calendar-range"></i> Collections This Year</h5>
+            </div>
+            <div class="card-body text-center">
+                <h1 class="text-success">${{ "{:,.2f}".format(this_year_collected) }}</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Averages Row -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-calculator"></i> Averages</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <h6 class="text-muted">Average Deal Size</h6>
+                        <h3 class="text-primary">${{ "{:,.2f}".format(avg_deal_size) }}</h3>
+                    </div>
+                    <div class="col-6">
+                        <h6 class="text-muted">Average Payment</h6>
+                        <h3 class="text-success">${{ "{:,.2f}".format(avg_payment) }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-pie-chart"></i> Deal Status Breakdown</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-3">
+                        <h6 class="text-muted">Active</h6>
+                        <h3 class="text-success">{{ status_counts['active'] }}</h3>
+                    </div>
+                    <div class="col-3">
+                        <h6 class="text-muted">Paid Off</h6>
+                        <h3 class="text-info">{{ status_counts['paid_off'] }}</h3>
+                    </div>
+                    <div class="col-3">
+                        <h6 class="text-muted">Suspended</h6>
+                        <h3 class="text-warning">{{ status_counts['suspended'] }}</h3>
+                    </div>
+                    <div class="col-3">
+                        <h6 class="text-muted">Defaulted</h6>
+                        <h3 class="text-danger">{{ status_counts['defaulted'] }}</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Top Customers -->
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-trophy"></i> Top 10 Outstanding Balances</h5>
+            </div>
+            <div class="card-body">
+                {% if top_customers %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Customer</th>
+                                <th>Outstanding</th>
+                                <th>Total Paid</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for loc in top_customers %}
+                            <tr>
+                                <td>
+                                    <a href="{{ url_for('admin.view_deal', id=loc.id) }}">
+                                        {{ loc.customer.business_name }}
+                                    </a>
+                                </td>
+                                <td><strong class="text-danger">${{ "{:,.2f}".format(loc.outstanding_balance) }}</strong></td>
+                                <td class="text-success">${{ "{:,.2f}".format(loc.total_paid) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No active deals with outstanding balances.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Payments</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_payments %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Customer</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in recent_payments %}
+                            <tr>
+                                <td><small>{{ log.created_at.strftime('%m/%d/%Y') }}</small></td>
+                                <td><strong class="text-success">${{ log.extra_data.split('"amount": ')[1].split(',')[0] if '"amount":' in log.extra_data else 'N/A' }}</strong></td>
+                                <td><small>
+                                    {% if log.customer %}
+                                        {{ log.customer.business_name[:20] }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </small></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No payments recorded yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Portfolio Summary -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="bi bi-briefcase"></i> Portfolio Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <h6 class="text-muted">Total Deals</h6>
+                        <h3>{{ total_deals_count }}</h3>
+                        <small class="text-muted">{{ active_deals_count }} active</small>
+                    </div>
+                    <div class="col-md-4">
+                        <h6 class="text-muted">Collection Rate</h6>
+                        <h3>{{ "%.1f"|format((total_collected / (total_collected + total_outstanding) * 100) if (total_collected + total_outstanding) > 0 else 0) }}%</h3>
+                        <small class="text-muted">of total owed</small>
+                    </div>
+                    <div class="col-md-4">
+                        <h6 class="text-muted">Utilization Rate</h6>
+                        <h3>{{ "%.1f"|format((total_credit_used / total_credit_issued * 100) if total_credit_issued > 0 else 0) }}%</h3>
+                        <small class="text-muted">of available credit</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
